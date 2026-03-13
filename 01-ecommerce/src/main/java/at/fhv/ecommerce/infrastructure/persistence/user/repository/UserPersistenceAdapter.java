@@ -1,0 +1,27 @@
+package at.fhv.ecommerce.infrastructure.persistence.user.repository;
+
+import java.util.Optional;
+import org.springframework.stereotype.Component;
+import at.fhv.ecommerce.domain.user.model.User;
+import at.fhv.ecommerce.domain.user.model.UserId;
+import at.fhv.ecommerce.domain.user.ports.UserRepository;
+import at.fhv.ecommerce.infrastructure.persistence.user.mapper.UserMapper;
+import lombok.RequiredArgsConstructor;
+
+@Component
+@RequiredArgsConstructor
+public class UserPersistenceAdapter implements UserRepository {
+    private final JpaUserRepository jpa;
+    private final UserMapper mapper;
+
+    @Override
+    public void save(User model) {
+        var entity = mapper.toEntity(model);
+        jpa.save(entity);
+    }
+
+    @Override
+    public Optional<User> findById(UserId id) {
+        return jpa.findById(id.value()).map(mapper::toModel);
+    }
+}
