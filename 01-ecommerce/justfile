@@ -1,0 +1,18 @@
+gradle := "./gradlew"
+jar := "./build/libs/ecommerce-0.0.1-SNAPSHOT.jar"
+
+default:
+    just --list
+
+clean:
+    {{ gradle }} clean
+
+build:
+    {{ gradle }} build
+
+run:
+    java -jar {{ jar }}
+
+bnr:
+    {{ gradle }} build -x test
+    java -jar {{ jar }}
