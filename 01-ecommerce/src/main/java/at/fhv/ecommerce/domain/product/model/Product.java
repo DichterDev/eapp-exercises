@@ -2,6 +2,9 @@ package at.fhv.ecommerce.domain.product.model;
 
 import at.fhv.ecommerce.domain.common.DomainRoot;
 import at.fhv.ecommerce.domain.common.Money;
+import at.fhv.ecommerce.domain.product.event.ProductCreatedEvent;
+import at.fhv.ecommerce.domain.product.event.ProductIncreasedStockEvent;
+import at.fhv.ecommerce.domain.product.event.ProductReducedStockEvent;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +32,8 @@ public class Product extends DomainRoot {
             .stock(stock)
             .build();
 
+        product.registerEvent(new ProductCreatedEvent(product));
+
         return product;
     }
 
@@ -38,11 +43,17 @@ public class Product extends DomainRoot {
 
     public void increaseStock(Integer amount) {
         this.stock += amount;
+
+        this.registerEvent(new ProductIncreasedStockEvent(this, amount));
     }
 
     public void reduceStock(Integer amount) {
-        if (this.stock.compareTo(amount) <= 0) {
-            this.stock -= amount;
+        if (this.stock.compareTo(amount) < 0) {
+            return;
         }
+
+        this.stock -= amount;
+
+        this.registerEvent(new ProductReducedStockEvent(this, amount));
     }
 }
