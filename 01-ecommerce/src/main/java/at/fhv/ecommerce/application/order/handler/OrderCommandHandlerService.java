@@ -8,8 +8,11 @@ import at.fhv.ecommerce.application.order.command.CancelOrderCommand;
 import at.fhv.ecommerce.application.order.command.CompleteOrderCommand;
 import at.fhv.ecommerce.application.order.command.FailOrderCommand;
 import at.fhv.ecommerce.application.order.command.PlaceOrderCommand;
+import at.fhv.ecommerce.application.product.handler.ProductQueryHandler;
+import at.fhv.ecommerce.application.product.query.CheckIfProductExistsQuery;
 import at.fhv.ecommerce.domain.order.model.Order;
 import at.fhv.ecommerce.domain.order.model.OrderId;
+import at.fhv.ecommerce.domain.order.ports.OrderEventPublisher;
 import at.fhv.ecommerce.domain.order.ports.OrderRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,8 @@ import lombok.RequiredArgsConstructor;
 public class OrderCommandHandlerService implements OrderCommandHandler {
 
     private final OrderRepository repository;
+    private final OrderEventPublisher publisher;
+    private final ProductQueryHandler product;
 
     @Override
     @Transactional
@@ -26,10 +31,14 @@ public class OrderCommandHandlerService implements OrderCommandHandler {
         var order = Order.place(cmd.userId());
 
         cmd.items().forEach((productId, amount) -> {
-            order.addItem(productId, amount);
+            if (product.checkIfExists(new CheckIfProductExistsQuery(productId.value()))) {
+                order.addItem(productId, amount);
+            }
         });
 
         repository.save(order);
+
+        publisher.publish(order.pullEvents());
 
         return new CommandResponse(order.getId().value().toString());
     }

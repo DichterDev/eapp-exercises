@@ -3,6 +3,10 @@ package at.fhv.ecommerce.domain.order.model;
 import java.util.ArrayList;
 import java.util.List;
 import at.fhv.ecommerce.domain.common.DomainRoot;
+import at.fhv.ecommerce.domain.order.events.OrderCancelledEvent;
+import at.fhv.ecommerce.domain.order.events.OrderCompletedEvent;
+import at.fhv.ecommerce.domain.order.events.OrderFailedEvent;
+import at.fhv.ecommerce.domain.order.events.OrderPlacedEvent;
 import at.fhv.ecommerce.domain.product.model.ProductId;
 import at.fhv.ecommerce.domain.user.model.UserId;
 import lombok.AccessLevel;
@@ -35,6 +39,8 @@ public class Order extends DomainRoot {
             .userId(userId)
             .build();
 
+        order.registerEvent(new OrderPlacedEvent(order));
+
         return order;
     }
 
@@ -45,21 +51,30 @@ public class Order extends DomainRoot {
     }
 
     public void complete() {
-        if (this.status == Status.PENDING) {
-            this.status = Status.COMPLETED;
+        if (this.status != Status.PENDING) {
+            return;
         }
+
+        this.status = Status.COMPLETED;
+        this.registerEvent(new OrderCompletedEvent(this));
     }
 
     public void cancel() {
-        if (this.status == Status.PENDING) {
-            this.status = Status.CANCELLED;
+        if (this.status != Status.PENDING) {
+            return;
         }
 
+        this.status = Status.CANCELLED;
+        this.registerEvent(new OrderCancelledEvent(this));
     }
 
     public void fail() {
-        if (this.status == Status.PENDING) {
-            this.status = Status.FAILED;
+        if (this.status != Status.PENDING) {
+            return;
         }
+
+        this.status = Status.FAILED;
+        this.registerEvent(new OrderFailedEvent(this));
+
     }
 }
