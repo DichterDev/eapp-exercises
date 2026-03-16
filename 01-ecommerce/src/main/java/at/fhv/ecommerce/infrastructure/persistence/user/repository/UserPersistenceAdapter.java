@@ -1,7 +1,9 @@
 package at.fhv.ecommerce.infrastructure.persistence.user.repository;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
+import at.fhv.ecommerce.domain.user.model.CartItem;
 import at.fhv.ecommerce.domain.user.model.User;
 import at.fhv.ecommerce.domain.user.model.UserId;
 import at.fhv.ecommerce.domain.user.ports.UserRepository;
@@ -24,4 +26,15 @@ public class UserPersistenceAdapter implements UserRepository {
     public Optional<User> findById(UserId id) {
         return jpa.findById(id.value()).map(mapper::toModel);
     }
+
+    @Override
+    public Optional<User> findByIdWithCartItems(UserId id) {
+        return jpa.findByIdWithCartItems(id.value()).map(mapper::toModel);
+    }
+
+    @Override
+    public List<CartItem> findCartItemsById(UserId id) {
+        return jpa.findByIdWithCartItems(id.value()).map(mapper::toModel).orElseThrow().getCart();
+    }
+
 }

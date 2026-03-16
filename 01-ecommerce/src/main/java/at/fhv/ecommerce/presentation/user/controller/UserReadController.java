@@ -4,8 +4,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import at.fhv.ecommerce.application.user.handler.UserQueryHandler;
 import at.fhv.ecommerce.application.user.query.GetUserByIdQuery;
+import at.fhv.ecommerce.application.user.query.GetUserByIdWithCartQuery;
+import at.fhv.ecommerce.application.user.view.UserDetailView;
 import at.fhv.ecommerce.application.user.view.UserView;
 import at.fhv.ecommerce.presentation.user.mapper.UserResponseMapper;
+import at.fhv.ecommerce.presentation.user.response.UserDetailResponse;
 import at.fhv.ecommerce.presentation.user.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import java.util.UUID;
@@ -29,4 +32,12 @@ public class UserReadController {
         return ResponseEntity.ok(mapper.toResponse(view));
     }
 
+    @GetMapping("/{id}/detail")
+    public ResponseEntity<UserDetailResponse> getDetail(@RequestParam String id) {
+        UUID uuid = UUID.fromString(id);
+
+        UserDetailView view = query.handleGetWithCart(new GetUserByIdWithCartQuery(uuid));
+
+        return ResponseEntity.ok(mapper.toResponse(view));
+    }
 }
