@@ -1,5 +1,8 @@
 package at.fhv.ecommerce.domain.user.model;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import at.fhv.ecommerce.domain.common.DomainRoot;
 import at.fhv.ecommerce.domain.user.event.UserRegisteredEvent;
 import lombok.AccessLevel;
@@ -17,11 +20,18 @@ public class User extends DomainRoot {
     private final UserId id = UserId.generate();
     private final String name;
 
+    @Builder.Default
+    private List<CartItem> cart = new ArrayList<>();
+
     public static User register(String name) {
         var user = User.builder().name(name).build();
 
         user.registerEvent(new UserRegisteredEvent(user));
 
         return user;
+    }
+
+    public void addCartItem(CartItem item) {
+        this.cart.add(item);
     }
 }

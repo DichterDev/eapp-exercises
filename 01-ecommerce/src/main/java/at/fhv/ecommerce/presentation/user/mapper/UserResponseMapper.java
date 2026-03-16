@@ -4,7 +4,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import at.fhv.ecommerce.application.common.command.CommandResponse;
+import at.fhv.ecommerce.application.user.view.UserDetailView;
 import at.fhv.ecommerce.application.user.view.UserView;
+import at.fhv.ecommerce.presentation.user.response.UserDetailResponse;
 import at.fhv.ecommerce.presentation.user.response.UserIdResponse;
 import at.fhv.ecommerce.presentation.user.response.UserResponse;
 
@@ -12,6 +14,9 @@ import at.fhv.ecommerce.presentation.user.response.UserResponse;
 public interface UserResponseMapper {
     @Mapping(target = "userId", source = "id")
     UserResponse toResponse(UserView view);
+
+    @Mapping(target = "userId", source = "id")
+    UserDetailResponse toResponse(UserDetailView view);
 
     @Mapping(target = "userId", source = "id")
     UserIdResponse toResponse(CommandResponse res);
