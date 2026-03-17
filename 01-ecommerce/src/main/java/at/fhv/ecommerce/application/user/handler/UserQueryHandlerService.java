@@ -10,6 +10,8 @@ import at.fhv.ecommerce.application.order.query.GetOrdersByUserIdWithItemsQuery;
 import at.fhv.ecommerce.application.user.query.GetUserByIdQuery;
 import at.fhv.ecommerce.application.user.query.GetUserByIdWithCartQuery;
 import at.fhv.ecommerce.application.user.query.GetUserOrdersById;
+import at.fhv.ecommerce.application.user.query.GetUsersQuery;
+import at.fhv.ecommerce.application.user.query.GetUsersWithCartQuery;
 import at.fhv.ecommerce.application.user.view.CartItemView;
 import at.fhv.ecommerce.application.user.view.UserDetailView;
 import at.fhv.ecommerce.application.user.view.UserOrderView;
@@ -63,6 +65,26 @@ public class UserQueryHandlerService implements UserQueryHandler {
 
         return orders.stream().map(order -> {
             return new UserOrderView(order.id(), order.items());
+        }).toList();
+    }
+
+    @Override
+    public List<UserView> handleGetAll(GetUsersQuery query) {
+        return repository.all(query.page(), query.size()).stream().map(user -> {
+            return new UserView(user.getId().value(), user.getName());
+        }).toList();
+    }
+
+    @Override
+    public List<UserDetailView> handleGetAllDetail(GetUsersWithCartQuery query) {
+        return repository.allWithCartItems(query.page(), query.size()).stream().map(user -> {
+            return new UserDetailView(
+                user.getId().value(),
+                user.getName(),
+                user.getCart().stream().map(item -> {
+                    return new CartItemView(item.productId().value(), item.amount());
+                }).toList()
+            );
         }).toList();
     }
 }
