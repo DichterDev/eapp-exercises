@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import at.fhv.ecommerce.application.order.command.PlaceOrderCommand;
 import at.fhv.ecommerce.application.order.handler.OrderCommandHandler;
-import at.fhv.ecommerce.domain.product.model.ProductId;
-import at.fhv.ecommerce.domain.user.model.UserId;
 import at.fhv.ecommerce.presentation.order.mapper.OrderResponseMapper;
 import at.fhv.ecommerce.presentation.order.request.PlaceOrderRequest;
 import at.fhv.ecommerce.presentation.order.response.OrderIdResponse;
@@ -29,17 +27,22 @@ public class OrderWriteController {
 
     @PostMapping("/place")
     public ResponseEntity<OrderIdResponse> place(@RequestBody PlaceOrderRequest req) {
-        var userUUID = UUID.fromString(req.userId());
-        Map<ProductId, Integer> items = new HashMap<>();
-
-        for (Map.Entry<String, Integer> entry : req.items().entrySet()) {
-            var uuid = UUID.fromString(entry.getKey());
-            items.put(new ProductId(uuid), entry.getValue());
-        }
+        UUID uuid = UUID.randomUUID();
+        UUID userUUID = UUID.fromString(req.userId());
+        Map<UUID, Integer> items = req.items()
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    entry -> UUID.fromString(entry.getKey()),
+                    Map.Entry::getValue
+                )
+            );
 
         var res = command.handlePlace(
             new PlaceOrderCommand(
-                new UserId(userUUID),
+                uuid,
+                userUUID,
                 items
             )
         );

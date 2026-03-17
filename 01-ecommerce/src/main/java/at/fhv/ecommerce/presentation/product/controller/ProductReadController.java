@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/api/products")
@@ -20,10 +20,8 @@ public class ProductReadController {
     private final ProductResponseMapper mapper;
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> getById(@RequestParam String id) {
-        var uuid = UUID.fromString(id);
-
-        var view = query.handleGet(new GetProductByIdQuery(uuid));
+    public ResponseEntity<ProductResponse> getById(@PathVariable UUID id) {
+        var view = query.handleGet(new GetProductByIdQuery(id));
 
         return ResponseEntity.ok(mapper.toResponse(view));
     }

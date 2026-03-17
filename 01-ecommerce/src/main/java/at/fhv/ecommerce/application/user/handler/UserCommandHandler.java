@@ -11,7 +11,7 @@ public interface UserCommandHandler {
 
     void handleAddItem(AddItemToUserCartCommand cmd);
 
-    void handleCartCheckout(CheckoutUserCartCommand cmd);
+    CommandResponse handleCartCheckout(CheckoutUserCartCommand cmd);
 
     void handleCompleteCartCheckout(CompleteUserCartCheckoutCommand cmd);
 }

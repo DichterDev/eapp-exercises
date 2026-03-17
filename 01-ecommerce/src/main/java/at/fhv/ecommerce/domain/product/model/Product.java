@@ -24,8 +24,10 @@ public class Product extends DomainRoot {
     private Money price;
     private Integer stock;
 
-    public static Product create(String name, String description, Money price, Integer stock) {
+    public static Product create(ProductId id, String name, String description, Money price,
+        Integer stock) {
         var product = Product.builder()
+            .id(id)
             .name(name)
             .description(description)
             .price(price)

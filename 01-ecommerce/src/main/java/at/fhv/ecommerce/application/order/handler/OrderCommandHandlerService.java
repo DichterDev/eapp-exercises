@@ -14,6 +14,8 @@ import at.fhv.ecommerce.domain.order.model.Order;
 import at.fhv.ecommerce.domain.order.model.OrderId;
 import at.fhv.ecommerce.domain.order.ports.OrderEventPublisher;
 import at.fhv.ecommerce.domain.order.ports.OrderRepository;
+import at.fhv.ecommerce.domain.product.model.ProductId;
+import at.fhv.ecommerce.domain.user.model.UserId;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -28,11 +30,11 @@ public class OrderCommandHandlerService implements OrderCommandHandler {
     @Override
     @Transactional
     public CommandResponse handlePlace(PlaceOrderCommand cmd) {
-        var order = Order.place(cmd.userId());
+        var order = Order.place(new OrderId(cmd.orderId()), new UserId(cmd.userId()));
 
-        cmd.items().forEach((productId, amount) -> {
-            if (product.checkIfExists(new CheckIfProductExistsQuery(productId.value()))) {
-                order.addItem(productId, amount);
+        cmd.items().forEach((pId, amount) -> {
+            if (product.checkIfExists(new CheckIfProductExistsQuery(pId))) {
+                order.addItem(new ProductId(pId), amount);
             }
         });
 
@@ -45,29 +47,35 @@ public class OrderCommandHandlerService implements OrderCommandHandler {
 
     @Override
     public void handleComplete(CompleteOrderCommand cmd) {
-        var order = repository.findById(cmd.orderId()).orElseThrow();
+        var order = repository.findById(new OrderId(cmd.orderId())).orElseThrow();
 
         order.complete();
 
         repository.save(order);
+
+        publisher.publish(order.pullEvents());
     }
 
     @Override
     public void handleFail(FailOrderCommand cmd) {
-        var order = repository.findById(cmd.orderId()).orElseThrow();
+        var order = repository.findById(new OrderId(cmd.orderId())).orElseThrow();
 
         order.fail();
 
         repository.save(order);
+
+        publisher.publish(order.pullEvents());
     }
 
     @Override
     public void handleCancel(CancelOrderCommand cmd) {
-        var order = repository.findById(cmd.orderId()).orElseThrow();
+        var order = repository.findById(new OrderId(cmd.orderId())).orElseThrow();
 
         order.cancel();
 
         repository.save(order);
+
+        publisher.publish(order.pullEvents());
     }
 
 }

@@ -6,6 +6,10 @@ import java.util.Currency;
 
 public record Money(BigDecimal value, Currency currency) {
 
+    public Money(BigDecimal amount) {
+        this(amount, Currency.getInstance("EUR"));
+    }
+
     public Money {
         if (value == null) {
             throw new IllegalArgumentException("Money Value cannot be null!");

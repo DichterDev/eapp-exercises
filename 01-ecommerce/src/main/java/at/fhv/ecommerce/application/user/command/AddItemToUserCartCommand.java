@@ -1,9 +1,8 @@
 package at.fhv.ecommerce.application.user.command;
 
+import java.util.UUID;
 import at.fhv.ecommerce.application.common.command.Command;
-import at.fhv.ecommerce.domain.product.model.ProductId;
-import at.fhv.ecommerce.domain.user.model.UserId;
 
-public record AddItemToUserCartCommand(UserId userId, ProductId productId, Integer amount)
+public record AddItemToUserCartCommand(UUID userId, UUID productId, Integer amount)
     implements Command {
 }
