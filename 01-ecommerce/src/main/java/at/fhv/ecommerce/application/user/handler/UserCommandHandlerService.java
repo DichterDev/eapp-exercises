@@ -7,8 +7,11 @@ import at.fhv.ecommerce.application.user.command.AddItemToUserCartCommand;
 import at.fhv.ecommerce.application.user.command.CheckoutUserCartCommand;
 import at.fhv.ecommerce.application.user.command.CompleteUserCartCheckoutCommand;
 import at.fhv.ecommerce.application.user.command.RegisterUserCommand;
+import at.fhv.ecommerce.domain.order.model.OrderId;
+import at.fhv.ecommerce.domain.product.model.ProductId;
 import at.fhv.ecommerce.domain.user.model.CartItem;
 import at.fhv.ecommerce.domain.user.model.User;
+import at.fhv.ecommerce.domain.user.model.UserId;
 import at.fhv.ecommerce.domain.user.ports.UserEventPublisher;
 import at.fhv.ecommerce.domain.user.ports.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +26,7 @@ public class UserCommandHandlerService implements UserCommandHandler {
     @Override
     @Transactional
     public CommandResponse handleRegister(RegisterUserCommand cmd) {
-        var user = User.register(cmd.name());
+        var user = User.register(new UserId(cmd.userId()), cmd.name());
 
         repository.save(user);
 
@@ -35,9 +38,9 @@ public class UserCommandHandlerService implements UserCommandHandler {
     @Override
     @Transactional
     public void handleAddItem(AddItemToUserCartCommand cmd) {
-        var user = repository.findById(cmd.userId()).orElseThrow();
+        var user = repository.findById(new UserId(cmd.userId())).orElseThrow();
 
-        user.addCartItem(new CartItem(cmd.productId(), cmd.amount()));
+        user.addCartItem(new CartItem(new ProductId(cmd.productId()), cmd.amount()));
 
         repository.save(user);
 
@@ -46,18 +49,20 @@ public class UserCommandHandlerService implements UserCommandHandler {
 
     @Override
     @Transactional
-    public void handleCartCheckout(CheckoutUserCartCommand cmd) {
-        var user = repository.findById(cmd.userId()).orElseThrow();
+    public CommandResponse handleCartCheckout(CheckoutUserCartCommand cmd) {
+        var user = repository.findById(new UserId(cmd.userId())).orElseThrow();
 
-        user.checkoutCart();
+        user.checkoutCart(new OrderId(cmd.orderId()));
 
         publisher.publish(user.pullEvents());
+
+        return new CommandResponse(cmd.orderId().toString());
     }
 
     @Override
     @Transactional
     public void handleCompleteCartCheckout(CompleteUserCartCheckoutCommand cmd) {
-        var user = repository.findById(cmd.userId()).orElseThrow();
+        var user = repository.findById(new UserId(cmd.userId())).orElseThrow();
 
         user.completeCartCheckout();
 
