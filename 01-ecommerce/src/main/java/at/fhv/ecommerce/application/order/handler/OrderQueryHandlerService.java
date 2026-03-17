@@ -4,11 +4,14 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import at.fhv.ecommerce.application.order.query.GetOrderByIdQuery;
 import at.fhv.ecommerce.application.order.query.GetOrderByIdWithItemsQuery;
+import at.fhv.ecommerce.application.order.query.GetOrdersByUserIdWithItemsQuery;
 import at.fhv.ecommerce.application.order.view.OrderDetailsView;
 import at.fhv.ecommerce.application.order.view.OrderItemView;
 import at.fhv.ecommerce.application.order.view.OrderView;
+import at.fhv.ecommerce.domain.order.model.Order;
 import at.fhv.ecommerce.domain.order.model.OrderId;
 import at.fhv.ecommerce.domain.order.ports.OrderRepository;
+import at.fhv.ecommerce.domain.user.model.UserId;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -47,4 +50,25 @@ public class OrderQueryHandlerService implements OrderQueryHandler {
             items
         );
     }
+
+    @Override
+    public List<OrderDetailsView> handleGetByUserId(GetOrdersByUserIdWithItemsQuery query) {
+        List<Order> orders = repository.findByUserIdWithItems(
+            new UserId(query.userId()),
+            query.page(),
+            query.size()
+        );
+
+        return orders.stream().map(order -> {
+            return new OrderDetailsView(
+                order.getId().value(),
+                order.getUserId().value(),
+                order.getStatus().toString(),
+                order.getItems().stream().map(item -> {
+                    return new OrderItemView(item.getProductId().value(), item.getAmount());
+                }).toList()
+            );
+        }).toList();
+    }
+
 }

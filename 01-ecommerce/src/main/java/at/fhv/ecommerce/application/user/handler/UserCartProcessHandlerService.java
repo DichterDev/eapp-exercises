@@ -3,6 +3,7 @@ package at.fhv.ecommerce.application.user.handler;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import at.fhv.ecommerce.application.order.command.PlaceOrderCommand;
@@ -29,10 +30,10 @@ public class UserCartProcessHandlerService implements UserCartProcessHandler {
                 new GetUserByIdWithCartQuery(event.userId().value())
             );
 
-            Map<ProductId, Integer> cart = new HashMap<>();
+            Map<UUID, Integer> cart = new HashMap<>();
 
             user.cart().forEach(item -> {
-                ProductId pId = new ProductId(item.productId());
+                UUID pId = item.productId();
                 if (cart.containsKey(pId)) {
                     cart.put(pId, cart.get(pId) + item.amount());
                 } else {
@@ -40,11 +41,9 @@ public class UserCartProcessHandlerService implements UserCartProcessHandler {
                 }
             });
 
-            UserId uId = new UserId(user.id());
+            order.handlePlace(new PlaceOrderCommand(event.orderId().value(), user.id(), cart));
 
-            order.handlePlace(new PlaceOrderCommand(uId, cart));
-
-            command.handleCompleteCartCheckout(new CompleteUserCartCheckoutCommand(uId));
+            command.handleCompleteCartCheckout(new CompleteUserCartCheckoutCommand(user.id()));
         } catch (Exception ex) {
 
         }

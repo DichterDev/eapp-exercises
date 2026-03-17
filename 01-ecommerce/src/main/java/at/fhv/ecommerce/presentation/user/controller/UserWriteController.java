@@ -6,14 +6,13 @@ import at.fhv.ecommerce.application.user.command.AddItemToUserCartCommand;
 import at.fhv.ecommerce.application.user.command.CheckoutUserCartCommand;
 import at.fhv.ecommerce.application.user.command.RegisterUserCommand;
 import at.fhv.ecommerce.application.user.handler.UserCommandHandler;
-import at.fhv.ecommerce.domain.product.model.ProductId;
-import at.fhv.ecommerce.domain.user.model.UserId;
 import at.fhv.ecommerce.presentation.user.mapper.UserResponseMapper;
 import at.fhv.ecommerce.presentation.user.request.AddItemToUserCartRequest;
 import at.fhv.ecommerce.presentation.user.request.CheckoutUserCartRequest;
 import at.fhv.ecommerce.presentation.user.request.CreateUserRequest;
 import at.fhv.ecommerce.presentation.user.response.UserIdResponse;
 import lombok.RequiredArgsConstructor;
+import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +26,8 @@ public class UserWriteController {
 
     @PostMapping("/create")
     public ResponseEntity<UserIdResponse> create(@RequestBody CreateUserRequest req) {
-        var id = command.handleRegister(new RegisterUserCommand(req.name()));
+        UUID uuid = UUID.randomUUID();
+        var id = command.handleRegister(new RegisterUserCommand(uuid, req.name()));
 
         return ResponseEntity.ok(mapper.toResponse(id));
     }
@@ -36,8 +36,8 @@ public class UserWriteController {
     public ResponseEntity<?> cartAdd(@RequestBody AddItemToUserCartRequest req) {
         command.handleAddItem(
             new AddItemToUserCartCommand(
-                new UserId(req.userId()),
-                new ProductId(req.productId()),
+                req.userId(),
+                req.productId(),
                 req.amount()
             )
         );
@@ -47,11 +47,8 @@ public class UserWriteController {
 
     @PostMapping("/cart/checkout")
     public ResponseEntity<?> cartCheckout(@RequestBody CheckoutUserCartRequest req) {
-        command.handleCartCheckout(
-            new CheckoutUserCartCommand(
-                new UserId(req.userId())
-            )
-        );
+        UUID orderID = UUID.randomUUID();
+        command.handleCartCheckout(new CheckoutUserCartCommand(req.userId(), orderID));
 
         return ResponseEntity.ok().build();
     }

@@ -3,6 +3,7 @@ package at.fhv.ecommerce.domain.user.model;
 import java.util.ArrayList;
 import java.util.List;
 import at.fhv.ecommerce.domain.common.DomainRoot;
+import at.fhv.ecommerce.domain.order.model.OrderId;
 import at.fhv.ecommerce.domain.user.event.UserCartCheckedOutEvent;
 import at.fhv.ecommerce.domain.user.event.UserCartCompletedCheckoutEvent;
 import at.fhv.ecommerce.domain.user.event.UserRegisteredEvent;
@@ -24,8 +25,8 @@ public class User extends DomainRoot {
     @Builder.Default
     private List<CartItem> cart = new ArrayList<>();
 
-    public static User register(String name) {
-        var user = User.builder().name(name).build();
+    public static User register(UserId id, String name) {
+        var user = User.builder().id(id).name(name).build();
 
         user.registerEvent(new UserRegisteredEvent(user));
 
@@ -36,8 +37,8 @@ public class User extends DomainRoot {
         this.cart.add(item);
     }
 
-    public void checkoutCart() {
-        this.registerEvent(new UserCartCheckedOutEvent(this));
+    public void checkoutCart(OrderId orderId) {
+        this.registerEvent(new UserCartCheckedOutEvent(this, orderId));
     }
 
     public void completeCartCheckout() {

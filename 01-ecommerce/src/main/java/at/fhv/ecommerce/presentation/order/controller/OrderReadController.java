@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -22,19 +22,15 @@ public class OrderReadController {
     private final OrderResponseMapper mapper;
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponse> get(@RequestParam String id) {
-        var uuid = UUID.fromString(id);
-
-        var view = query.handleGet(new GetOrderByIdQuery(uuid));
+    public ResponseEntity<OrderResponse> get(@PathVariable UUID id) {
+        var view = query.handleGet(new GetOrderByIdQuery(id));
 
         return ResponseEntity.ok(mapper.toResponse(view));
     }
 
     @GetMapping("/{id}/detail")
-    public ResponseEntity<OrderDetailResponse> getDetail(@RequestParam String id) {
-        var uuid = UUID.fromString(id);
-
-        var view = query.handleGetWithItems(new GetOrderByIdWithItemsQuery(uuid));
+    public ResponseEntity<OrderDetailResponse> getDetail(@PathVariable UUID id) {
+        var view = query.handleGetWithItems(new GetOrderByIdWithItemsQuery(id));
 
         return ResponseEntity.ok(mapper.toResponse(view));
     }

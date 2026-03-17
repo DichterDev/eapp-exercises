@@ -17,6 +17,9 @@ import at.fhv.ecommerce.application.product.command.CreateProductCommand;
 import at.fhv.ecommerce.application.product.handler.ProductCommandHandler;
 import at.fhv.ecommerce.application.product.handler.ProductQueryHandler;
 import at.fhv.ecommerce.application.product.query.GetProductByIdQuery;
+import at.fhv.ecommerce.application.user.command.AddItemToUserCartCommand;
+import at.fhv.ecommerce.application.user.command.CheckoutUserCartCommand;
+import at.fhv.ecommerce.application.user.command.CompleteUserCartCheckoutCommand;
 import at.fhv.ecommerce.application.user.command.RegisterUserCommand;
 import at.fhv.ecommerce.application.user.handler.UserCommandHandler;
 import at.fhv.ecommerce.application.user.handler.UserQueryHandler;
@@ -42,29 +45,37 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        CommandResponse uRes = userCommand.handleRegister(new RegisterUserCommand("test"));
-        CommandResponse pRes = productCommand.handleCreate(
-            new CreateProductCommand(
-                "P1", "", new Money(BigDecimal.TEN, Currency.getInstance("EUR")), 10
-            )
+        // USER
+        var uID = UUID.randomUUID();
+
+        userCommand.handleRegister(new RegisterUserCommand(uID, "Test User"));
+
+        // PRODUCT
+        var pID = UUID.randomUUID();
+
+        productCommand.handleCreate(
+            new CreateProductCommand(pID, "P1", "Product 1", new BigDecimal(7.5), 100)
         );
 
-        UserId uId = new UserId(UUID.fromString(uRes.id()));
-        ProductId pId = new ProductId(UUID.fromString(pRes.id()));
+        // ORDER
+        var oID = UUID.randomUUID();
 
-        HashMap<ProductId, Integer> orderItems = new HashMap<>();
-        orderItems.put(pId, 5);
+        orderCommand.handlePlace(new PlaceOrderCommand(oID, uID, Map.of(pID, 10)));
 
-        CommandResponse oRes = orderCommand.handlePlace(new PlaceOrderCommand(uId, orderItems));
+        // ADD TO USER CART
+        userCommand.handleAddItem(new AddItemToUserCartCommand(uID, pID, 20));
 
-        OrderId oId = new OrderId(UUID.fromString(oRes.id()));
+        // CHECKOUT CART
+        UUID checkoutOrder = UUID.randomUUID();
+        userCommand.handleCartCheckout(new CheckoutUserCartCommand(uID, checkoutOrder));
 
-        var uView = userQuery.handleGet(new GetUserByIdQuery(uId.value()));
-        var pView = productQuery.handleGet(new GetProductByIdQuery(pId.value()));
-        var oView = orderQuery.handleGetWithItems(new GetOrderByIdWithItemsQuery(oId.value()));
-
-        System.out.println(uView.toString());
-        System.out.println(pView.toString());
-        System.out.println(oView.toString());
+        System.out.println("User ID:");
+        System.out.println(uID);
+        System.out.println("Product ID:");
+        System.out.println(pID);
+        System.out.println("Order ID:");
+        System.out.println(oID);
+        System.out.println("Checkout Order ID:");
+        System.out.println(checkoutOrder);
     }
 }
