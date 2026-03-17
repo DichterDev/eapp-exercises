@@ -3,12 +3,14 @@ package at.fhv.ecommerce.presentation.user.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import at.fhv.ecommerce.application.user.command.AddItemToUserCartCommand;
+import at.fhv.ecommerce.application.user.command.CheckoutUserCartCommand;
 import at.fhv.ecommerce.application.user.command.RegisterUserCommand;
 import at.fhv.ecommerce.application.user.handler.UserCommandHandler;
 import at.fhv.ecommerce.domain.product.model.ProductId;
 import at.fhv.ecommerce.domain.user.model.UserId;
 import at.fhv.ecommerce.presentation.user.mapper.UserResponseMapper;
 import at.fhv.ecommerce.presentation.user.request.AddItemToUserCartRequest;
+import at.fhv.ecommerce.presentation.user.request.CheckoutUserCartRequest;
 import at.fhv.ecommerce.presentation.user.request.CreateUserRequest;
 import at.fhv.ecommerce.presentation.user.response.UserIdResponse;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,17 @@ public class UserWriteController {
                 new UserId(req.userId()),
                 new ProductId(req.productId()),
                 req.amount()
+            )
+        );
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/cart/checkout")
+    public ResponseEntity<?> cartCheckout(@RequestBody CheckoutUserCartRequest req) {
+        command.handleCartCheckout(
+            new CheckoutUserCartCommand(
+                new UserId(req.userId())
             )
         );
 
