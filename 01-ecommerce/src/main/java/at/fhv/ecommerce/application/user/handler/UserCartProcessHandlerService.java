@@ -35,8 +35,9 @@ public class UserCartProcessHandlerService implements UserCartProcessHandler {
                 ProductId pId = new ProductId(item.productId());
                 if (cart.containsKey(pId)) {
                     cart.put(pId, cart.get(pId) + item.amount());
+                } else {
+                    cart.put(pId, item.amount());
                 }
-                cart.put(pId, item.amount());
             });
 
             UserId uId = new UserId(user.id());
