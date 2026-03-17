@@ -11,4 +11,8 @@ public interface UserRepository extends BaseRepository<User, UserId> {
     Optional<User> findByIdWithCartItems(UserId id);
 
     List<CartItem> findCartItemsById(UserId id);
+
+    List<User> all(Integer page, Integer size);
+
+    List<User> allWithCartItems(Integer page, Integer size);
 }
