@@ -7,6 +7,7 @@ import at.fhv.ecommerce.application.product.command.CreateProductCommand;
 import at.fhv.ecommerce.application.product.command.IncreaseProductStockCommand;
 import at.fhv.ecommerce.application.product.command.ReduceProductStockCommand;
 import at.fhv.ecommerce.application.product.command.UpdateProductPriceCommand;
+import at.fhv.ecommerce.domain.common.Money;
 import at.fhv.ecommerce.domain.product.model.Product;
 import at.fhv.ecommerce.domain.product.model.ProductId;
 import at.fhv.ecommerce.domain.product.ports.ProductRepository;
@@ -21,7 +22,13 @@ public class ProductCommandHandlerService implements ProductCommandHandler {
     @Override
     @Transactional
     public CommandResponse handleCreate(CreateProductCommand cmd) {
-        var product = Product.create(cmd.name(), cmd.description(), cmd.price(), cmd.stock());
+        var product = Product.create(
+            new ProductId(cmd.productId()),
+            cmd.name(),
+            cmd.description(),
+            new Money(cmd.price()),
+            cmd.stock()
+        );
 
         repository.save(product);
 
@@ -31,7 +38,7 @@ public class ProductCommandHandlerService implements ProductCommandHandler {
     @Override
     @Transactional
     public void handleIncreaseStock(IncreaseProductStockCommand cmd) {
-        var product = repository.findById(cmd.productId()).orElseThrow();
+        var product = repository.findById(new ProductId(cmd.productId())).orElseThrow();
 
         product.increaseStock(cmd.amount());
 
@@ -41,7 +48,7 @@ public class ProductCommandHandlerService implements ProductCommandHandler {
     @Override
     @Transactional
     public void handleReduceStock(ReduceProductStockCommand cmd) {
-        var product = repository.findById(cmd.productId()).orElseThrow();
+        var product = repository.findById(new ProductId(cmd.productId())).orElseThrow();
 
         product.reduceStock(cmd.amount());
 
@@ -51,11 +58,10 @@ public class ProductCommandHandlerService implements ProductCommandHandler {
     @Override
     @Transactional
     public void handlePriceUpdate(UpdateProductPriceCommand cmd) {
-        var product = repository.findById(cmd.productId()).orElseThrow();
+        var product = repository.findById(new ProductId(cmd.productId())).orElseThrow();
 
         product.updatePrice(cmd.newPrice());
 
         repository.save(product);
     }
-
 }

@@ -34,8 +34,9 @@ public class Order extends DomainRoot {
         PENDING, COMPLETED, FAILED, CANCELLED,
     }
 
-    public static Order place(UserId userId) {
+    public static Order place(OrderId id, UserId userId) {
         var order = Order.builder()
+            .id(id)
             .userId(userId)
             .build();
 

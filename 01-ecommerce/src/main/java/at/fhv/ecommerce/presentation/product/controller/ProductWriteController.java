@@ -2,6 +2,7 @@ package at.fhv.ecommerce.presentation.product.controller;
 
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,11 +25,13 @@ public class ProductWriteController {
 
     @PostMapping("/create")
     public ResponseEntity<ProductIdResponse> postMethodName(@RequestBody CreateProductRequest req) {
+        UUID uuid = UUID.randomUUID();
         var res = command.handleCreate(
             new CreateProductCommand(
+                uuid,
                 req.name(),
                 req.description(),
-                new Money(BigDecimal.valueOf(req.price()), Currency.getInstance(req.currency())),
+                BigDecimal.valueOf(req.price()),
                 req.stock()
             )
         );

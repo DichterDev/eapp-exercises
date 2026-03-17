@@ -5,10 +5,14 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import at.fhv.ecommerce.application.order.handler.OrderQueryHandler;
+import at.fhv.ecommerce.application.order.query.GetOrdersByUserIdWithItemsQuery;
 import at.fhv.ecommerce.application.user.query.GetUserByIdQuery;
 import at.fhv.ecommerce.application.user.query.GetUserByIdWithCartQuery;
+import at.fhv.ecommerce.application.user.query.GetUserOrdersById;
 import at.fhv.ecommerce.application.user.view.CartItemView;
 import at.fhv.ecommerce.application.user.view.UserDetailView;
+import at.fhv.ecommerce.application.user.view.UserOrderView;
 import at.fhv.ecommerce.application.user.view.UserView;
 import at.fhv.ecommerce.domain.user.model.CartItem;
 import at.fhv.ecommerce.domain.user.model.UserId;
@@ -19,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserQueryHandlerService implements UserQueryHandler {
     private final UserRepository repository;
+    private final OrderQueryHandler order;
 
     @Override
     @Transactional
@@ -48,5 +53,16 @@ public class UserQueryHandlerService implements UserQueryHandler {
             user.getName(),
             cart
         );
+    }
+
+    @Override
+    public List<UserOrderView> handleGetOrders(GetUserOrdersById query) {
+        var orders = order.handleGetByUserId(
+            new GetOrdersByUserIdWithItemsQuery(query.userId(), query.page(), query.size())
+        );
+
+        return orders.stream().map(order -> {
+            return new UserOrderView(order.id(), order.items());
+        }).toList();
     }
 }

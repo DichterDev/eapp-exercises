@@ -8,7 +8,6 @@ import at.fhv.ecommerce.application.order.query.GetOrderByIdWithItemsQuery;
 import at.fhv.ecommerce.application.product.command.ReduceProductStockCommand;
 import at.fhv.ecommerce.application.product.handler.ProductCommandHandler;
 import at.fhv.ecommerce.domain.order.events.OrderPlacedEvent;
-import at.fhv.ecommerce.domain.product.model.ProductId;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -32,16 +31,16 @@ public class OrderProcessHandlerService implements OrderProcessHandler {
             order.items().forEach(view -> {
                 product.handleReduceStock(
                     new ReduceProductStockCommand(
-                        new ProductId(view.productId()),
+                        view.productId(),
                         view.amount()
                     )
                 );
             });
 
-            command.handleComplete(new CompleteOrderCommand(event.orderId()));
+            command.handleComplete(new CompleteOrderCommand(event.orderId().value()));
 
         } catch (Exception ex) {
-            command.handleFail(new FailOrderCommand(event.orderId()));
+            command.handleFail(new FailOrderCommand(event.orderId().value()));
         }
     }
 }

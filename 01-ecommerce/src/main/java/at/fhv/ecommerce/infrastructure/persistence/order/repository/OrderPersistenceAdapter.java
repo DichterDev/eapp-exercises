@@ -1,10 +1,13 @@
 package at.fhv.ecommerce.infrastructure.persistence.order.repository;
 
+import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import at.fhv.ecommerce.domain.order.model.Order;
 import at.fhv.ecommerce.domain.order.model.OrderId;
 import at.fhv.ecommerce.domain.order.ports.OrderRepository;
+import at.fhv.ecommerce.domain.user.model.UserId;
 import at.fhv.ecommerce.infrastructure.persistence.order.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
 
@@ -29,5 +32,13 @@ public class OrderPersistenceAdapter implements OrderRepository {
     @Override
     public Optional<Order> findByIdWithItems(OrderId id) {
         return jpa.findByIdWithItems(id.value()).map(mapper::toModel);
+    }
+
+    @Override
+    public List<Order> findByUserIdWithItems(UserId userId, Integer page, Integer size) {
+        return jpa.findByUserIdWithItems(userId.value(), PageRequest.of(page, size))
+            .stream()
+            .map(mapper::toModel)
+            .toList();
     }
 }
