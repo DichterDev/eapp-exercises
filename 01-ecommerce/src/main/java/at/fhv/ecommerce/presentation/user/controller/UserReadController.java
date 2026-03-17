@@ -6,6 +6,8 @@ import at.fhv.ecommerce.application.user.handler.UserQueryHandler;
 import at.fhv.ecommerce.application.user.query.GetUserByIdQuery;
 import at.fhv.ecommerce.application.user.query.GetUserByIdWithCartQuery;
 import at.fhv.ecommerce.application.user.query.GetUserOrdersById;
+import at.fhv.ecommerce.application.user.query.GetUsersQuery;
+import at.fhv.ecommerce.application.user.query.GetUsersWithCartQuery;
 import at.fhv.ecommerce.application.user.view.UserDetailView;
 import at.fhv.ecommerce.application.user.view.UserView;
 import at.fhv.ecommerce.presentation.user.mapper.UserResponseMapper;
@@ -14,6 +16,7 @@ import at.fhv.ecommerce.presentation.user.response.UserOrdersResponse;
 import at.fhv.ecommerce.presentation.user.response.UserResponse;
 import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
+import java.util.List;
 import java.util.UUID;
 import org.apache.catalina.connector.Response;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +29,30 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class UserReadController {
     private final UserQueryHandler query;
     private final UserResponseMapper mapper;
+
+    @GetMapping("/all")
+    public ResponseEntity<List<UserResponse>> getAll(
+        @PathParam("page") Integer page,
+        @PathParam("size") Integer size) {
+        var res = query.handleGetAll(new GetUsersQuery(page, size))
+            .stream()
+            .map(mapper::toResponse)
+            .toList();
+
+        return ResponseEntity.ok(res);
+    }
+
+    @GetMapping("/all/detail")
+    public ResponseEntity<List<UserDetailResponse>> getAllDetail(
+        @PathParam("page") Integer page,
+        @PathParam("size") Integer size) {
+        var res = query.handleGetAllDetail(new GetUsersWithCartQuery(page, size))
+            .stream()
+            .map(mapper::toResponse)
+            .toList();
+
+        return ResponseEntity.ok(res);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getById(@PathVariable UUID id) {
