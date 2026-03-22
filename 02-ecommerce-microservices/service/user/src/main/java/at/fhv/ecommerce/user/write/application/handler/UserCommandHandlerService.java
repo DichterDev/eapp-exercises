@@ -13,6 +13,7 @@ import at.fhv.ecommerce.user.write.domain.model.User;
 import at.fhv.ecommerce.user.write.domain.model.UserId;
 import at.fhv.ecommerce.user.write.domain.port.UserEventPublisher;
 import at.fhv.ecommerce.user.write.domain.port.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -26,6 +27,7 @@ public class UserCommandHandlerService implements UserCommandHandler {
     }
 
     @Override
+    @Transactional
     public CommandResponse register(RegisterUser cmd) {
         var user = User.register(new UserId(cmd.userId()), cmd.name());
 
@@ -37,6 +39,7 @@ public class UserCommandHandlerService implements UserCommandHandler {
     }
 
     @Override
+    @Transactional
     public void rename(ChangeUserName cmd) {
         var user = get(cmd.userId());
 
@@ -48,6 +51,7 @@ public class UserCommandHandlerService implements UserCommandHandler {
     }
 
     @Override
+    @Transactional
     public void addItem(AddUserCartItem cmd) {
         var user = get(cmd.userId());
 
@@ -59,6 +63,7 @@ public class UserCommandHandlerService implements UserCommandHandler {
     }
 
     @Override
+    @Transactional
     public void checkout(CheckoutUserCart cmd) {
         var user = get(cmd.userId());
 
@@ -70,6 +75,7 @@ public class UserCommandHandlerService implements UserCommandHandler {
     }
 
     @Override
+    @Transactional
     public void completeCheckout(CompleteUserCartCheckout cmd) {
         var user = get(cmd.userId());
 

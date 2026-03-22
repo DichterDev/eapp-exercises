@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class SpringUserRepository implements UserRepository {
+public class SpringUserReadRepository implements UserRepository {
 
     private final JpaUserRepository jpa;
 

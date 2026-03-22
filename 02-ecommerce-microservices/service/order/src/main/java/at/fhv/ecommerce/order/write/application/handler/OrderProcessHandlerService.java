@@ -1,8 +1,8 @@
 package at.fhv.ecommerce.order.write.application.handler;
 
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import at.fhv.ecommerce.order.read.application.handler.OrderQueryHandler;
-import at.fhv.ecommerce.order.read.application.query.GetOrderById;
 import at.fhv.ecommerce.order.read.application.query.GetOrderDetailById;
 import at.fhv.ecommerce.order.write.application.client.ProductClient;
 import at.fhv.ecommerce.order.write.domain.event.OrderPlaced;
@@ -15,6 +15,7 @@ public class OrderProcessHandlerService implements OrderProcessHandler {
     private final OrderQueryHandler query;
 
     @Override
+    @EventListener
     public void handle(OrderPlaced event) {
         var order = query.getDetail(new GetOrderDetailById(event.orderId().value()));
 
