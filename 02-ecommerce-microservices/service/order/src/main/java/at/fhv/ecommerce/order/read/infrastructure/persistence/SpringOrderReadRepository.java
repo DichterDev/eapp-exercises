@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class SpringOrderRepository implements OrderRepository {
+public class SpringOrderReadRepository implements OrderRepository {
     private final JpaOrderRepository jpa;
 
     @Override
