@@ -15,14 +15,19 @@ public class RestProductClient implements ProductClient {
     }
 
     @Override
-    public void reduceStock(UUID productId, Integer amount) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'reduceStock'");
+    public void reduceStock(String productId, Integer amount) {
+        client.post()
+            .uri("/{id}/reduce-stock", productId)
+            .body(amount)
+            .retrieve()
+            .toBodilessEntity();
     }
 
     @Override
-    public Double getPrice(UUID productId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getPrice'");
+    public Double getPrice(String productId) {
+        return client.get()
+            .uri("/{id}/price", productId)
+            .retrieve()
+            .body(Double.class);
     }
 }
