@@ -5,7 +5,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import at.fhv.ecommerce.common.domain.Money;
 
-@Mapper
+@Mapper()
 public interface MoneyMapper {
     @Mapping(target = "value", source = "amount")
     @Mapping(target = "add", ignore = true)
