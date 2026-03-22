@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class SpringProductRepository implements ProductRepository {
+public class SpringProductReadRepository implements ProductRepository {
     private final JpaProductRepository jpa;
 
     @Override

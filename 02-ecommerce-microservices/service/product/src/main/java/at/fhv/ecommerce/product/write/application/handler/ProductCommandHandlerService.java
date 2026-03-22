@@ -11,6 +11,7 @@ import at.fhv.ecommerce.product.write.application.command.IncreaseProductStock;
 import at.fhv.ecommerce.product.write.application.command.ReduceProductStock;
 import at.fhv.ecommerce.product.write.domain.model.Product;
 import at.fhv.ecommerce.product.write.domain.model.ProductId;
+import at.fhv.ecommerce.product.write.domain.port.ProductEventPublisher;
 import at.fhv.ecommerce.product.write.domain.port.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductCommandHandlerService implements ProductCommandHandler {
     private final ProductRepository repository;
+    private final ProductEventPublisher publisher;
 
     private Product get(UUID id) {
         return repository.findById(new ProductId(id)).orElseThrow();
@@ -37,6 +39,8 @@ public class ProductCommandHandlerService implements ProductCommandHandler {
 
         repository.save(product);
 
+        publisher.publishAll(product.pullEvents());
+
         return new CommandResponse(cmd.id().toString());
     }
 
@@ -48,6 +52,8 @@ public class ProductCommandHandlerService implements ProductCommandHandler {
         product.updatePrice(new Money(BigDecimal.valueOf(cmd.newPrice())));
 
         repository.save(product);
+
+        publisher.publishAll(product.pullEvents());
     }
 
     @Override
@@ -58,6 +64,8 @@ public class ProductCommandHandlerService implements ProductCommandHandler {
         product.reduceStock(cmd.amount());
 
         repository.save(product);
+
+        publisher.publishAll(product.pullEvents());
     }
 
     @Override
@@ -68,5 +76,7 @@ public class ProductCommandHandlerService implements ProductCommandHandler {
         product.increaseStock(cmd.amount());
 
         repository.save(product);
+
+        publisher.publishAll(product.pullEvents());
     }
 }
