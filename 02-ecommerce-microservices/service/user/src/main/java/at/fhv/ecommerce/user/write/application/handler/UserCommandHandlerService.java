@@ -65,7 +65,7 @@ public class UserCommandHandlerService implements UserCommandHandler {
 
     @Override
     @Transactional
-    public void checkout(CheckoutUserCart cmd) {
+    public CommandResponse checkout(CheckoutUserCart cmd) {
         var user = get(cmd.userId());
 
         user.cartCheckout(new OrderId(cmd.orderId()));
@@ -73,6 +73,8 @@ public class UserCommandHandlerService implements UserCommandHandler {
         repository.save(user);
 
         publisher.publishAll(user.pullEvents());
+
+        return new CommandResponse(cmd.orderId().toString());
     }
 
     @Override
