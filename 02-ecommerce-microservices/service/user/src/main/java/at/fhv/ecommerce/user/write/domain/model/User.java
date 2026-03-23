@@ -47,8 +47,8 @@ public class User extends BaseDomainRoot {
         this.registerEvent(new UserCartAddedItem(this, productId));
     }
 
-    public void cartCheckout() {
-        this.registerEvent(new UserCartCheckedOut(this));
+    public void cartCheckout(OrderId orderId) {
+        this.registerEvent(new UserCartCheckedOut(this, orderId));
     }
 
     public void cartCompleteCheckout() {
