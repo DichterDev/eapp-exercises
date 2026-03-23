@@ -27,7 +27,7 @@ services:
   product-service:
     image: eclipse-temurin:21-jre-alpine
     container_name: product-service
-    ports: ["8081:8081"]
+    ports: ["8081:8080"]
     volumes: ["./service/product/build/libs/product.jar:/app/service.jar"]
     command: ["java", "-jar", "/app/service.jar"]
     init: true
@@ -37,16 +37,17 @@ services:
         condition: on-failure
         delay: 10s
     environment:
+      - SERVICES_ORDER_URL=http://order-service:8080
+      - SERVICES_USER_URL=http://user-service:8080
       - SPRING_DATASOURCE_URL=jdbc:postgresql://product-db:5432/product_db
       - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=kafka:9092
 
   order-service:
     image: eclipse-temurin:21-jre-alpine
     container_name: order-service
-    ports: ["8082:8082"]
+    ports: ["8082:8080"]
     volumes: ["./service/order/build/libs/order.jar:/app/service.jar"]
     command: ["java", "-jar", "/app/service.jar"]
     init: true
@@ -56,16 +57,17 @@ services:
         condition: on-failure
         delay: 10s
     environment:
+      - SERVICES_PRODUCT_URL=http://product-service:8080
+      - SERVICES_USER_URL=http://user-service:8080
       - SPRING_DATASOURCE_URL=jdbc:postgresql://order-db:5432/order_db
       - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=kafka:9092
 
   user-service:
     image: eclipse-temurin:21-jre-alpine
     container_name: user-service
-    ports: ["8083:8083"]
+    ports: ["8083:8080"]
     volumes: ["./service/user/build/libs/user.jar:/app/service.jar"]
     command: ["java", "-jar", "/app/service.jar"]
     init: true
@@ -75,11 +77,12 @@ services:
         condition: on-failure
         delay: 10s
     environment:
+      - SERVICES_ORDER_URL=http://order-service:8080
+      - SERVICES_PRODUCT_URL=http://product-service:8080
       - SPRING_DATASOURCE_URL=jdbc:postgresql://user-db:5432/user_db
       - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=kafka:9092
 
   api-gateway:
     image: eclipse-temurin:21-jre-alpine
@@ -92,3 +95,7 @@ services:
       restart_policy:
         condition: on-failure
         delay: 10s
+    environment:
+      - SERVICES_ORDER_URL=http://order-service:8080
+      - SERVICES_USER_URL=http://user-service:8080
+      - SERVICES_PRODUCT_URL=http://product-service:8080
