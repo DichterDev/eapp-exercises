@@ -30,3 +30,7 @@ This starts:
 
 The API Gateway Swagger ui also publishes the API docs of the services but uses the internal Docker Container names in the request which breaks the requests.
 I dont want to put in the work to fix this problem, but still.
+
+Due to rushed development, there are indiscrepancies between the methods in the gateway and the parameters they send to the services.
+
+Routing works, gateway based operations are incomplete, or need more work to order the sent requests more to what the services expect.
