@@ -8,6 +8,7 @@ import at.fhv.ecommerce.user.write.application.command.ChangeUserName;
 import at.fhv.ecommerce.user.write.application.command.CheckoutUserCart;
 import at.fhv.ecommerce.user.write.application.command.CompleteUserCartCheckout;
 import at.fhv.ecommerce.user.write.application.command.RegisterUser;
+import at.fhv.ecommerce.user.write.domain.model.OrderId;
 import at.fhv.ecommerce.user.write.domain.model.ProductId;
 import at.fhv.ecommerce.user.write.domain.model.User;
 import at.fhv.ecommerce.user.write.domain.model.UserId;
@@ -67,7 +68,7 @@ public class UserCommandHandlerService implements UserCommandHandler {
     public void checkout(CheckoutUserCart cmd) {
         var user = get(cmd.userId());
 
-        user.cartCheckout();
+        user.cartCheckout(new OrderId(cmd.orderId()));
 
         repository.save(user);
 
