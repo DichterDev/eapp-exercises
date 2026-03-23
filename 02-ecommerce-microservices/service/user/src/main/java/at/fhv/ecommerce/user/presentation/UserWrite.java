@@ -29,8 +29,8 @@ public class UserWrite {
     }
 
     @PostMapping("/{id}/change-name")
-    public ResponseEntity<Void> changeName(@PathVariable UUID userId, @RequestBody String newName) {
-        handler.rename(new ChangeUserName(userId, newName));
+    public ResponseEntity<Void> changeName(@PathVariable UUID id, @RequestBody String newName) {
+        handler.rename(new ChangeUserName(id, newName));
         return ResponseEntity.ok().build();
     }
 
@@ -43,15 +43,15 @@ public class UserWrite {
     }
 
     @PostMapping("/{id}/cart/checkout")
-    public ResponseEntity<CommandResponse> checkoutCart(@PathVariable UUID userId) {
+    public ResponseEntity<CommandResponse> checkoutCart(@PathVariable UUID id) {
         var oId = UUID.randomUUID();
-        var res = handler.checkout(new CheckoutUserCart(userId, oId));
+        var res = handler.checkout(new CheckoutUserCart(id, oId));
         return ResponseEntity.ok(res);
     }
 
     @PostMapping("/{id}/cart/complete-checkout")
-    public ResponseEntity<Void> completeCheckout(@PathVariable UUID userId) {
-        handler.completeCheckout(new CompleteUserCartCheckout(userId));
+    public ResponseEntity<Void> completeCheckout(@PathVariable UUID id) {
+        handler.completeCheckout(new CompleteUserCartCheckout(id));
         return ResponseEntity.ok().build();
     }
 }
