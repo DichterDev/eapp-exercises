@@ -69,10 +69,23 @@ public class GatewayWrite {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/users/cart/add")
+    public ResponseEntity<Void> addToCart(@RequestBody AddToCartRequest req) {
+        // The User service expects AddUserCartItem as the body
+        var command = new AddUserCartItem(req.productId(), req.quantity());
+
+        restClient.post()
+            .uri("/api/users/{id}/cart/add", req.userId()) // Use {id} to match UserWrite
+            .body(command)
+            .retrieve()
+            .toBodilessEntity();
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/users/{userId}/cart/checkout")
     public ResponseEntity<Void> checkout(@PathVariable UUID userId) {
         restClient.post()
-            .uri("/api/users/{userId}/cart/checkout", userId)
+            .uri("/api/users/{id}/cart/checkout", userId) // Use {id} to match UserWrite
             .retrieve()
             .toBodilessEntity();
         return ResponseEntity.ok().build();
