@@ -12,18 +12,21 @@ build:
     {{ gradle }} build
 
 run:
-    java -jar {{ discovery }} & \
+    {{ gradle }} :discovery:bootRun & \
     sleep 10; \
-    java -jar {{ order }} & \
-    java -jar {{ user }} & \
-    java -jar {{ product }} & \
-    java -jar {{ gateway }}
+    {{ gradle }} :user:bootRun & \
+    {{ gradle }} :product:bootRun & \
+    {{ gradle }} :order:bootRun & \
+    {{ gradle }} :gateway:bootRun
 
 bnr:
     {{ gradle }} build -x test
-    java -jar {{ discovery }} & \
+    {{ gradle }} :discovery:bootRun & \
     sleep 10; \
-    java -jar {{ order }} & \
-    java -jar {{ user }} & \
-    java -jar {{ product }} & \
-    java -jar {{ gateway }}
+    {{ gradle }} :user:bootRun & \
+    {{ gradle }} :product:bootRun & \
+    {{ gradle }} :order:bootRun & \
+    {{ gradle }} :gateway:bootRun
+
+kill:
+    -pkill -f 'java -jar' || true
