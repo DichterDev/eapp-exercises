@@ -1,0 +1,29 @@
+gradle := "./gradlew"
+order := "./order/build/libs/order-0.0.1-SNAPSHOT.jar"
+user := "./user/build/libs/user-0.0.1-SNAPSHOT.jar"
+product := "./product/build/libs/product-0.0.1-SNAPSHOT.jar"
+gateway := "./gateway/build/libs/gateway-0.0.1-SNAPSHOT.jar"
+discovery := "./discovery/build/libs/discovery-0.0.1-SNAPSHOT.jar"
+
+clean:
+    {{ gradle }} clean
+
+build:
+    {{ gradle }} build
+
+run:
+    java -jar {{ discovery }} & \
+    sleep 10; \
+    java -jar {{ order }} & \
+    java -jar {{ user }} & \
+    java -jar {{ product }} & \
+    java -jar {{ gateway }}
+
+bnr:
+    {{ gradle }} build -x test
+    java -jar {{ discovery }} & \
+    sleep 10; \
+    java -jar {{ order }} & \
+    java -jar {{ user }} & \
+    java -jar {{ product }} & \
+    java -jar {{ gateway }}
