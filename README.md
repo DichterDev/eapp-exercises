@@ -3,7 +3,7 @@
 # Projects
 ## 01 Ecommerce Application
 
-("./01-ecommerce/")[Folder]
+[Folder](./01-ecommerce/)
 
 ## 02 Ecommerce with REST inter-service Communication
 
