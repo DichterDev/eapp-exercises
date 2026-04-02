@@ -11,22 +11,15 @@ clean:
 build:
     {{ gradle }} build
 
-run:
-    {{ gradle }} :discovery:bootRun & \
+run: kill
+    java -jar {{ discovery }} & \
     sleep 10; \
-    {{ gradle }} :user:bootRun & \
-    {{ gradle }} :product:bootRun & \
-    {{ gradle }} :order:bootRun & \
-    {{ gradle }} :gateway:bootRun
+    java -jar {{ order }} & \
+    java -jar {{ user }} & \
+    java -jar {{ product }} & \
+    java -jar {{ gateway }}
 
-bnr:
-    {{ gradle }} build -x test
-    {{ gradle }} :discovery:bootRun & \
-    sleep 10; \
-    {{ gradle }} :user:bootRun & \
-    {{ gradle }} :product:bootRun & \
-    {{ gradle }} :order:bootRun & \
-    {{ gradle }} :gateway:bootRun
+bnr: build run
 
 kill:
-    -pkill -f 'java -jar' || true
+    -pkill -f 'bootRun|java -jar' || true
