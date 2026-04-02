@@ -1,5 +1,6 @@
 package at.fhv.product.presentation;
 
+import at.fhv.common.application.client.response.ProductPriceResponse;
 import at.fhv.product.application.handler.ProductQueryHandler;
 import at.fhv.product.application.query.GetProductById;
 
@@ -32,4 +33,10 @@ public class ProductReadController {
         return query.getDetail(new GetProductDetailById(id));
     }
 
+    @GetMapping("/{id}/price")
+    public ProductPriceResponse getPrice(@PathVariable UUID id) {
+        var product = query.get(new GetProductById(id));
+
+        return new ProductPriceResponse(product.productId(), product.price());
     }
+}

@@ -1,6 +1,5 @@
 package at.fhv.user.domain.model;
 
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,16 +46,18 @@ public class User extends BaseDomainRoot {
         this.registerEvent(new UserCartAddedItem(this.id.value(), productId.value()));
     }
 
-    public void checkout() {
-        var items = this.cart.stream()
-                .map(item -> new UserCartCheckedOutItem(
-                        item.productId().value(),
-                        item.amount(),
-                        item.price().value().doubleValue()
-                ))
-                .toList();
+    public UUID checkout() {
+        HashMap<UUID, Integer> items = new HashMap<>();
 
-        this.registerEvent(new UserCartCheckedOut(this.id.value(), items));
+        this.cart.forEach(
+            item -> items.merge(item.productId().value(), item.amount(), Integer::sum)
+        );
+
+        var event = new UserCartCheckedOut(this.id.value(), items);
+
+        this.registerEvent(event);
+
+        return event.id();
     }
 
     public void completeCheckout() {

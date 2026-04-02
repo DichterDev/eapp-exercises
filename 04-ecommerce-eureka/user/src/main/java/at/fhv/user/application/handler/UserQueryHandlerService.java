@@ -1,7 +1,10 @@
 package at.fhv.user.application.handler;
 
+import at.fhv.user.application.client.OrderClient;
+import at.fhv.user.application.client.ProductClient;
 import at.fhv.user.application.query.*;
 import at.fhv.user.domain.port.UserReadRepository;
+import at.fhv.user.projection.OrderItem;
 import at.fhv.user.projection.User;
 import at.fhv.user.projection.UserDetail;
 import at.fhv.user.projection.UserOrder;
@@ -16,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserQueryHandlerService implements UserQueryHandler {
     private final UserReadRepository repository;
+    private final OrderClient order;
 
     @Override
     public User get(GetUserById query) {
@@ -29,7 +33,20 @@ public class UserQueryHandlerService implements UserQueryHandler {
 
     @Override
     public List<UserOrder> getOrders(GetUserOrdersById query) {
-        return repository.getOrders(query.userId());
+        var orders = order.getOrders(query.userId());
+
+        return orders.stream()
+            .map(
+                order -> new UserOrder(
+                    order.orderId(),
+                    order.orderItems()
+                        .stream()
+                        .map(item -> new OrderItem(item.productId(), item.amount(), item.price()))
+                        .toList(),
+                    order.status()
+                )
+            )
+            .toList();
     }
 
 }

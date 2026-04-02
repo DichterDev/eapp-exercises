@@ -12,11 +12,6 @@ public interface UserCommandHandler {
 
     void checkout(CheckoutUserCart cmd);
 
-    void registerUserOrder(RegisterUserOrder cmd);
-
-    void completeUserOrder(CompleteUserOrder cmd);
-
-    void failUserOrder(FailUserOrder cmd);
-
     void completeCartCheckout(CompleteUserCartCheckout cmd);
 }
+

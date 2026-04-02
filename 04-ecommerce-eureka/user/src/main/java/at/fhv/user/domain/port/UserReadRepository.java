@@ -10,6 +10,6 @@ import java.util.UUID;
 
 public interface UserReadRepository {
     Optional<User> get(UUID id);
+
     Optional<UserDetail> getDetail(UUID id);
-    List<UserOrder> getOrders(UUID id);
 }

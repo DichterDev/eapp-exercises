@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.UUID;
 import java.util.function.Consumer;
 
 @Configuration
@@ -19,11 +18,13 @@ public class UserCartCheckedOutConsumer {
     @Bean
     public Consumer<UserCartCheckedOut> userEventsIn() {
         return event -> {
-            command.place(new PlaceOrder(
+            command.place(
+                new PlaceOrder(
                     event.id(),
                     event.userId(),
                     event.items()
-            ));
+                )
+            );
         };
     }
 }
