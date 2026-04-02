@@ -1,6 +1,5 @@
 package at.fhv.product.infrastructure.persistence.mapper;
 
-import at.fhv.common.infrastructure.persistence.MoneyMapper;
 import at.fhv.product.projection.Product;
 import at.fhv.product.infrastructure.persistence.entity.ProductEntity;
 import at.fhv.product.projection.ProductDetail;
@@ -9,7 +8,6 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface ProductReadMapper {
-
     @Mapping(target = "productId", source = "id")
     @Mapping(target = "price", source = "price.amount")
     @Mapping(target = "currency", source = "price.currency")

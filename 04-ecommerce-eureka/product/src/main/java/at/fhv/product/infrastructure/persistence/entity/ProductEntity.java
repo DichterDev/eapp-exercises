@@ -2,7 +2,6 @@ package at.fhv.product.infrastructure.persistence.entity;
 
 import java.util.UUID;
 
-import at.fhv.common.infrastructure.persistence.MoneyEmbed;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -29,7 +28,7 @@ public class ProductEntity {
     private String description;
 
     @Embedded
-    private MoneyEmbed price;
+    private MoneyEmbeddable price;
 
     @Column(nullable = false)
     private Integer stock;

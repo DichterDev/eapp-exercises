@@ -1,20 +1,18 @@
 package at.fhv.order.infrastructure.persistence.mapper;
 
 import at.fhv.common.domain.model.Money;
-import at.fhv.common.infrastructure.persistence.MoneyEmbed;
-import at.fhv.common.infrastructure.persistence.MoneyMapper;
 import at.fhv.order.domain.model.*;
+import at.fhv.order.infrastructure.persistence.entity.MoneyEmbeddable;
 import at.fhv.order.infrastructure.persistence.entity.OrderEntity;
 import at.fhv.order.infrastructure.persistence.entity.OrderItemEmbeddable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.Currency;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", uses = { MoneyMapper.class })
+@Mapper(componentModel = "spring")
 public interface OrderWriteMapper {
 
     @Mapping(target = "id", source = "id")
@@ -54,28 +52,32 @@ public interface OrderWriteMapper {
     }
 
     default OrderItemEmbeddable map(OrderItem item) {
-        if (item == null) return null;
+        if (item == null)
+            return null;
 
         return new OrderItemEmbeddable(
-                item.getProductId() != null ? item.getProductId().value() : null,
-                item.getAmount(),
-                item.getPrice() != null
-                        ? new MoneyEmbed(
-                        item.getPrice().value(),
-                        item.getPrice().currency().getCurrencyCode()
+            item.getProductId() != null ? item.getProductId().value() : null,
+            item.getAmount(),
+            item.getPrice() != null
+                ? new MoneyEmbeddable(
+                    item.getPrice().value(),
+                    item.getPrice().currency().getCurrencyCode()
                 )
-                        : null
+                : null
         );
     }
 
     default OrderItem map(OrderItemEmbeddable embeddable) {
-        if (embeddable == null) return null;
+        if (embeddable == null)
+            return null;
 
         return OrderItem.builder()
-                .productId(embeddable.getProductId() != null ? new ProductId(embeddable.getProductId()) : null)
-                .amount(embeddable.getAmount())
-                .price(mapMoney(embeddable.getPrice()))
-                .build();
+            .productId(
+                embeddable.getProductId() != null ? new ProductId(embeddable.getProductId()) : null
+            )
+            .amount(embeddable.getAmount())
+            .price(map(embeddable.getPrice()))
+            .build();
     }
 
     default List<OrderItemEmbeddable> mapItems(List<OrderItem> items) {
@@ -86,9 +88,11 @@ public interface OrderWriteMapper {
         return items == null ? null : items.stream().map(this::map).collect(Collectors.toList());
     }
 
-    default Money mapMoney(MoneyEmbed embed) {
-        if (embed == null) return null;
-        return new Money(embed.getAmount(), Currency.getInstance(embed.getCurrency()));
+    default Money map(MoneyEmbeddable money) {
+        return new Money(money.getAmount());
+    }
+
+    default MoneyEmbeddable map(Money money) {
+        return new MoneyEmbeddable(money.value(), money.currency().toString());
     }
 }
-

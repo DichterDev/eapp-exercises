@@ -25,36 +25,39 @@ public interface OrderReadMapper {
     OrderDetail toDetail(OrderEntity entity);
 
     default OrderItem map(OrderItemEmbeddable embeddable) {
-        if (embeddable == null) return null;
+        if (embeddable == null)
+            return null;
 
         Double unitPrice = embeddable.getPrice() != null
-                ? embeddable.getPrice().getAmount().doubleValue()
-                : null;
+            ? embeddable.getPrice().getAmount().doubleValue()
+            : null;
 
         Double lineTotal = (unitPrice != null && embeddable.getAmount() != null)
-                ? embeddable.getAmount() * unitPrice
-                : null;
+            ? embeddable.getAmount() * unitPrice
+            : null;
 
         return new OrderItem(
-                embeddable.getProductId(),
-                embeddable.getAmount(),
-                unitPrice,
-                lineTotal
+            embeddable.getProductId(),
+            embeddable.getAmount(),
+            unitPrice,
+            lineTotal
         );
     }
 
     default List<OrderItem> map(List<OrderItemEmbeddable> list) {
-        if (list == null) return null;
+        if (list == null)
+            return null;
         return list.stream().map(this::map).toList();
     }
 
     default Double calculateTotal(List<OrderItemEmbeddable> items) {
-        if (items == null) return null;
+        if (items == null)
+            return null;
 
         return items.stream()
-                .map(this::map)
-                .map(OrderItem::lineTotal)
-                .filter(java.util.Objects::nonNull)
-                .reduce(0.0, Double::sum);
+            .map(this::map)
+            .map(OrderItem::lineTotal)
+            .filter(java.util.Objects::nonNull)
+            .reduce(0.0, Double::sum);
     }
 }

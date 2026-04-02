@@ -1,6 +1,5 @@
 package at.fhv.order.infrastructure.persistence.entity;
 
-import at.fhv.common.infrastructure.persistence.MoneyEmbed;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;
@@ -24,5 +23,5 @@ public class OrderItemEmbeddable {
     private Integer amount;
 
     @Embedded
-    private MoneyEmbed price;
+    private MoneyEmbeddable price;
 }
