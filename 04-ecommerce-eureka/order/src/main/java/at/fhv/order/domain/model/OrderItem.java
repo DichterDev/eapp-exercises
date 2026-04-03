@@ -7,7 +7,6 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-
 public class OrderItem {
     private final ProductId productId;
     private final Integer amount;
@@ -16,10 +15,10 @@ public class OrderItem {
 
     public static OrderItem add(ProductId productId, Integer amount, Money price) {
         var item = OrderItem.builder()
-                .productId(productId)
-                .amount(amount)
-                .price(price)
-                .build();
+            .productId(productId)
+            .amount(amount)
+            .price(price)
+            .build();
 
         return item;
     }

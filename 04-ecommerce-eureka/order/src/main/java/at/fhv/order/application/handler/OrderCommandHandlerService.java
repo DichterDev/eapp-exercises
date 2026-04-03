@@ -1,16 +1,22 @@
 package at.fhv.order.application.handler;
 
 import at.fhv.common.application.command.CommandResponse;
+import at.fhv.common.domain.model.Money;
+import at.fhv.order.application.client.ProductClient;
 import at.fhv.order.application.command.*;
 import at.fhv.order.domain.model.Order;
 import at.fhv.order.domain.model.OrderId;
+import at.fhv.order.domain.model.OrderItemDTO;
+import at.fhv.order.domain.model.ProductId;
 import at.fhv.order.domain.model.UserId;
 import at.fhv.order.domain.port.OrderEventPublisher;
 import at.fhv.order.domain.port.OrderWriteRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -19,6 +25,7 @@ import java.util.UUID;
 public class OrderCommandHandlerService implements OrderCommandHandler {
     private final OrderWriteRepository repository;
     private final OrderEventPublisher publisher;
+    private final ProductClient product;
 
     private Order get(UUID id) {
         return repository.findById(new OrderId(id)).orElseThrow();
@@ -31,10 +38,24 @@ public class OrderCommandHandlerService implements OrderCommandHandler {
             return new CommandResponse(cmd.orderId().toString());
         }
 
+        var prices = product.getPrices(cmd.orderItems().keySet().stream().toList());
+
+        List<OrderItemDTO> items = new ArrayList<>();
+
+        prices.forEach(
+            (id, price) -> items.add(
+                new OrderItemDTO(
+                    new ProductId(id),
+                    cmd.orderItems().get(id),
+                    new Money(BigDecimal.valueOf(price))
+                )
+            )
+        );
+
         var order = Order.place(
-                new OrderId(cmd.orderId()),
-                new UserId(cmd.userId()),
-                cmd.orderItems()
+            new OrderId(cmd.orderId()),
+            new UserId(cmd.userId()),
+            items
         );
 
         repository.save(order);

@@ -4,7 +4,6 @@ import at.fhv.common.domain.event.order.OrderCancelled;
 import at.fhv.common.domain.event.order.OrderCompleted;
 import at.fhv.common.domain.event.order.OrderFailed;
 import at.fhv.common.domain.event.order.OrderPlaced;
-import at.fhv.common.domain.event.user.UserCartCheckedOutItem;
 import at.fhv.common.domain.model.BaseDomainRoot;
 import at.fhv.common.domain.model.Money;
 import lombok.*;
@@ -37,43 +36,16 @@ public class Order extends BaseDomainRoot {
         PENDING, COMPLETED, FAILED, CANCELLED
     }
 
-    public static Order place(OrderId id, UserId userId, List<UserCartCheckedOutItem> orderItems) {
+    public static Order place(OrderId id, UserId userId, List<OrderItemDTO> orderItems) {
         var order = Order.builder()
-                .id(id)
-                .userId(userId)
-                .status(Status.PENDING)
-                .items(new ArrayList<>())
-                .reducedItemsCount(0)
-                .build();
+            .id(id)
+            .userId(userId)
+            .status(Status.PENDING)
+            .items(new ArrayList<>())
+            .reducedItemsCount(0)
+            .build();
 
-        var groupedItems = orderItems == null
-                ? Map.<UUID, UserCartCheckedOutItem>of()
-                : orderItems.stream()
-                .collect(Collectors.toMap(
-                        UserCartCheckedOutItem::productId,
-                        item -> item,
-                        (left, right) -> new UserCartCheckedOutItem(
-                                left.productId(),
-                                left.amount() + right.amount(),
-                                left.price()
-                        )
-                ));
-
-        groupedItems.values().forEach(item ->
-                order.addItem(
-                        new ProductId(item.productId()),
-                        item.amount(),
-                        new Money(BigDecimal.valueOf(item.price()))
-                )
-        );
-
-        Map<UUID, Integer> eventItems = groupedItems.values().stream()
-                .collect(Collectors.toMap(
-                        UserCartCheckedOutItem::productId,
-                        UserCartCheckedOutItem::amount
-                ));
-
-        order.registerEvent(new OrderPlaced(order.id.value(), order.userId.value(), eventItems));
+        orderItems.forEach(item -> order.addItem(item.productId(), item.amount(), item.price()));
 
         return order;
     }
