@@ -11,15 +11,6 @@ clean:
 build:
     {{ gradle }} build
 
-run: kill
-    java -jar {{ discovery }} & \
-    sleep 10; \
-    java -jar {{ order }} & \
-    java -jar {{ user }} & \
-    java -jar {{ product }} & \
-    java -jar {{ gateway }}
-
-bnr: build run
-
-kill:
-    -pkill -f 'bootRun|java -jar' || true
+bnr:
+    {{ gradle }} build -x test
+    docker compose up -d --force-recreate

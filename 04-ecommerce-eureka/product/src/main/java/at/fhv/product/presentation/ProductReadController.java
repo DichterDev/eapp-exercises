@@ -10,9 +10,13 @@ import at.fhv.product.projection.ProductDetail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -28,7 +32,7 @@ public class ProductReadController {
         return query.get(new GetProductById(id));
     }
 
-    @GetMapping("/detail/{id}")
+    @GetMapping("/{id}/detail")
     public ProductDetail getDetail(@PathVariable UUID id) {
         return query.getDetail(new GetProductDetailById(id));
     }
@@ -38,5 +42,17 @@ public class ProductReadController {
         var product = query.get(new GetProductById(id));
 
         return new ProductPriceResponse(product.productId(), product.price());
+    }
+
+    @PostMapping("/prices")
+    public Map<UUID, Double> getPrices(@RequestBody List<UUID> ids) {
+        Map<UUID, Double> prices = new HashMap<>();
+
+        ids.forEach(id -> {
+            var product = query.get(new GetProductById(id));
+            prices.put(product.productId(), product.price());
+        });
+
+        return prices;
     }
 }

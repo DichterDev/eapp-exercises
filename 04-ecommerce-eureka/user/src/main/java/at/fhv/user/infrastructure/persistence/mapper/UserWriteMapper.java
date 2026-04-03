@@ -47,30 +47,20 @@ public interface UserWriteMapper {
     }
 
     default CartItem map(CartItemEmbeddable embeddable) {
-        if (embeddable == null) return null;
+        if (embeddable == null)
+            return null;
         return new CartItem(
-                new ProductId(embeddable.getProductId()),
-                embeddable.getAmount(),
-                new Money(BigDecimal.valueOf(embeddable.getPrice()))
+            new ProductId(embeddable.getProductId()),
+            embeddable.getAmount()
         );
     }
 
     default CartItemEmbeddable map(CartItem item) {
-        if (item == null) return null;
+        if (item == null)
+            return null;
         return new CartItemEmbeddable(
-                item.productId().value(),
-                item.amount(),
-                item.price().value().doubleValue()
+            item.productId().value(),
+            item.amount()
         );
-    }
-
-    default List<CartItem> mapCartToDomain(List<CartItemEmbeddable> list) {
-        if (list == null) return null;
-        return list.stream().map(this::map).toList();
-    }
-
-    default List<CartItemEmbeddable> mapCartToEntity(List<CartItem> list) {
-        if (list == null) return null;
-        return list.stream().map(this::map).toList();
     }
 }

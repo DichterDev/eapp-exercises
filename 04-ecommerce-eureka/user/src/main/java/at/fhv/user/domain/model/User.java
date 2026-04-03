@@ -39,9 +39,8 @@ public class User extends BaseDomainRoot {
         this.registerEvent(new UserChangedName(this.id.value(), oldName));
     }
 
-    public void addCartItem(ProductId productId, Integer amount, Money price) {
-        this.cart = new ArrayList<>(this.cart);
-        this.cart.add(new CartItem(productId, amount, price));
+    public void addCartItem(ProductId productId, Integer amount) {
+        this.cart.add(new CartItem(productId, amount));
 
         this.registerEvent(new UserCartAddedItem(this.id.value(), productId.value()));
     }

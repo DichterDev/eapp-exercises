@@ -53,12 +53,9 @@ public class UserCommandHandlerService implements UserCommandHandler {
     public void addItem(AddUserCartItem cmd) {
         var user = get(cmd.userId());
 
-        var price = product.getPrice(cmd.productId()).price();
-
         user.addCartItem(
             new ProductId(cmd.productId()),
-            cmd.amount(),
-            new Money(BigDecimal.valueOf(price))
+            cmd.amount()
         );
 
         repository.save(user);
@@ -81,7 +78,8 @@ public class UserCommandHandlerService implements UserCommandHandler {
 
     @Override
     public void completeCartCheckout(CompleteUserCartCheckout cmd) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'completeCartCheckout'");
+        var user = get(cmd.userId());
+
+        user.completeCheckout();
     }
 }

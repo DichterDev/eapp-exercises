@@ -20,7 +20,5 @@ public class CartItemEmbeddable {
 
     @Column(nullable = false)
     private Integer amount;
-
-    @Column(nullable = false)
-    private Double price;
 }
+

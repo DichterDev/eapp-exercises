@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import at.fhv.common.application.client.response.OrderResponse;
 
-@FeignClient(name = "order-client")
+@FeignClient(name = "order")
 public interface OrderClient {
-    @GetMapping("/api/orders/{userId}")
-    List<OrderResponse> getOrders(@PathVariable("userId") UUID userId);
+    @GetMapping("/api/orders/q/{userId}")
+    List<OrderResponse> getOrders(@PathVariable UUID userId);
 }

@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import at.fhv.common.application.client.response.ProductPriceResponse;
 
-@FeignClient(name = "product-client")
+@FeignClient(name = "product")
 public interface ProductClient {
     @GetMapping("/api/products/q/{productId}/price")
-    ProductPriceResponse getPrice(@PathVariable("productId") UUID productId);
+    ProductPriceResponse getPrice(@PathVariable UUID productId);
 }
