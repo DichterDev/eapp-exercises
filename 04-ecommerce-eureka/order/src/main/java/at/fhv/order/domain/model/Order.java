@@ -63,8 +63,7 @@ public class Order extends BaseDomainRoot {
         this.reducedItemsCount++;
 
         if (this.reducedItemsCount >= this.items.size()) {
-            this.status = Status.COMPLETED;
-            this.registerEvent(new OrderCompleted(this.id.value()));
+            this.complete();
         }
     }
 

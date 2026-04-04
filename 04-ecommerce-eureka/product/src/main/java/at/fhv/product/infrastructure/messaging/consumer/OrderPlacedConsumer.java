@@ -1,4 +1,4 @@
-package at.fhv.product.infrastructure.messaging;
+package at.fhv.product.infrastructure.messaging.consumer;
 
 import at.fhv.common.domain.event.order.OrderPlaced;
 import at.fhv.common.domain.event.product.ProductFailedToReduceStock;
@@ -20,13 +20,11 @@ public class OrderPlacedConsumer {
     public Consumer<OrderPlaced> orderPlacedIn() {
         return event -> {
             try {
-                event.orderItems().forEach((productId, amount) ->
-                        command.reduceStock(new ReduceProductStock(
-                                productId,
-                                amount,
-                                event.orderId()
-                        ))
-                );
+                event.orderItems()
+                    .forEach(
+                        (productId, amount) -> command
+                            .reduceStock(new ReduceProductStock(productId, amount, event.orderId()))
+                    );
             } catch (Exception ex) {
                 throw ex;
             }

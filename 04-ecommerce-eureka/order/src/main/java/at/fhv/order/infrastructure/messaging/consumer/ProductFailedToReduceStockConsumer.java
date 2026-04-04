@@ -1,4 +1,4 @@
-package at.fhv.order.infrastructure.messaging;
+package at.fhv.order.infrastructure.messaging.consumer;
 
 import at.fhv.common.domain.event.product.ProductFailedToReduceStock;
 import at.fhv.order.application.command.FailOrder;
@@ -19,3 +19,4 @@ public class ProductFailedToReduceStockConsumer {
         return event -> command.fail(new FailOrder(event.orderId()));
     }
 }
+

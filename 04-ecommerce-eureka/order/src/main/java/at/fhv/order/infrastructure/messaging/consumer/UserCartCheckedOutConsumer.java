@@ -1,4 +1,4 @@
-package at.fhv.order.infrastructure.messaging;
+package at.fhv.order.infrastructure.messaging.consumer;
 
 import at.fhv.common.domain.event.user.UserCartCheckedOut;
 import at.fhv.order.application.command.PlaceOrder;
