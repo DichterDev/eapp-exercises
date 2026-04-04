@@ -12,3 +12,8 @@
 ## 03 Ecommerce with Kafka Messaging
 
 [Folder](./01-ecommerce/)
+
+## 04 Ecommerce with Eureka + Kafka + Gateway
+
+
+[Folder](./04-ecommerce/)
