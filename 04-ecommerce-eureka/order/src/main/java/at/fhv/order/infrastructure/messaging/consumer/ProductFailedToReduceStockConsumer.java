@@ -19,4 +19,3 @@ public class ProductFailedToReduceStockConsumer {
         return event -> command.fail(new FailOrder(event.orderId()));
     }
 }
-

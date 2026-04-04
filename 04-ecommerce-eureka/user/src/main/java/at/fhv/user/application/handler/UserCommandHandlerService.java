@@ -81,5 +81,9 @@ public class UserCommandHandlerService implements UserCommandHandler {
         var user = get(cmd.userId());
 
         user.completeCheckout();
+
+        repository.save(user);
+
+        publisher.publishAll(user.pullEvents());
     }
 }

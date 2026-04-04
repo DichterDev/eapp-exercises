@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -25,16 +24,21 @@ public class Product extends BaseDomainRoot {
     private Integer stock;
 
     public static Product create(ProductId id, String name, String description, Money price,
-                                 Integer stock) {
+        Integer stock) {
         var product = Product.builder()
-                .id(id)
-                .name(name)
-                .description(description)
-                .price(price)
-                .stock(stock)
-                .build();
+            .id(id)
+            .name(name)
+            .description(description)
+            .price(price)
+            .stock(stock)
+            .build();
 
-        product.registerEvent(new ProductCreated(product.id.value(), product.getName(), product.getDescription(), product.getPrice(), product.getStock()));
+        product.registerEvent(
+            new ProductCreated(
+                product.id.value(), product.getName(), product.getDescription(), product.getPrice(),
+                product.getStock()
+            )
+        );
 
         return product;
     }
@@ -54,21 +58,26 @@ public class Product extends BaseDomainRoot {
 
     public void reduceStock(Integer amount, UUID orderId) {
         if (this.stock.compareTo(amount) < 0) {
-            this.registerEvent(new ProductFailedToReduceStock(
+            this.registerEvent(
+                new ProductFailedToReduceStock(
                     this.id.value(),
                     orderId,
                     amount,
                     "Not enough stock"
-            ));
+                )
+            );
             return;
         }
 
         this.stock -= amount;
 
-        this.registerEvent(new ProductReducedStock(
+        this.registerEvent(
+            new ProductReducedStock(
                 this.id.value(),
                 orderId,
                 amount
-        ));
+            )
+        );
     }
 }
+
