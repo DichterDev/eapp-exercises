@@ -10,6 +10,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -46,6 +47,12 @@ public class Order extends BaseDomainRoot {
             .build();
 
         orderItems.forEach(item -> order.addItem(item.productId(), item.amount(), item.price()));
+
+        Map<UUID, Integer> items = new HashMap<>();
+
+        order.items.forEach(item -> items.put(item.getProductId().value(), item.getAmount()));
+
+        order.registerEvent(new OrderPlaced(order.id.value(), order.userId.value(), items));
 
         return order;
     }
