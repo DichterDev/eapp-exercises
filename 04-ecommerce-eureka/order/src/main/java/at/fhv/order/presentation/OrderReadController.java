@@ -1,5 +1,7 @@
 package at.fhv.order.presentation;
 
+import at.fhv.common.application.client.response.OrderItemResponse;
+import at.fhv.common.application.client.response.OrderResponse;
 import at.fhv.order.application.handler.OrderQueryHandler;
 import at.fhv.order.application.query.GetOrderById;
 import at.fhv.order.application.query.GetOrderDetailById;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
-
 @RestController
 @RequestMapping("/api/orders/q")
 @RequiredArgsConstructor
@@ -28,14 +29,33 @@ public class OrderReadController {
         return query.get(new GetOrderById(id));
     }
 
-    @GetMapping("/detail/{id}")
+    @GetMapping("/{id}/detail")
     public OrderDetail getDetail(@PathVariable UUID id) {
         return query.getDetail(new GetOrderDetailById(id));
     }
 
-    @GetMapping
-    public List<Order> getByUserId(@RequestParam UUID userId) {
-        return query.getOrders(new GetOrdersByUserId(userId));
+    @GetMapping("/user/{userId}")
+    public List<OrderResponse> getByUserId(@PathVariable UUID userId) {
+        var orders = query.getOrders(new GetOrdersByUserId(userId));
+
+        return orders.stream()
+            .map(
+                order -> new OrderResponse(
+                    order.orderId(),
+                    order.items()
+                        .stream()
+                        .map(
+                            item -> new OrderItemResponse(
+                                item.productId(),
+                                item.amount(),
+                                item.lineTotal()
+                            )
+                        )
+                        .toList(),
+                    order.status()
+                )
+            )
+            .toList();
     }
 
 }

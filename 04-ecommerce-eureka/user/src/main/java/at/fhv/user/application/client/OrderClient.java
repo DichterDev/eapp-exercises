@@ -9,6 +9,6 @@ import at.fhv.common.application.client.response.OrderResponse;
 
 @FeignClient(name = "order")
 public interface OrderClient {
-    @GetMapping("/api/orders/q/{userId}")
+    @GetMapping("/api/orders/q/user/{userId}")
     List<OrderResponse> getOrders(@PathVariable UUID userId);
 }

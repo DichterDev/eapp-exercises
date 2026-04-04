@@ -27,7 +27,7 @@ public class OrderQueryHandlerService implements OrderQueryHandler {
     }
 
     @Override
-    public List<Order> getOrders(GetOrdersByUserId query) {
+    public List<OrderDetail> getOrders(GetOrdersByUserId query) {
         return repository.getByUserId(query.userId());
     }
 

@@ -13,4 +13,8 @@ build:
 
 bnr:
     {{ gradle }} build -x test
-    docker compose up -d --force-recreate
+    docker compose up -d kafka postgres
+    sleep 5;
+    docker compose up -d discovery-service
+    sleep 10;
+    docker compose up -d --force-recreate gateway-service order-service product-service user-service

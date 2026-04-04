@@ -3,6 +3,7 @@ package at.fhv.user.infrastructure.messaging.consumer;
 import java.util.function.Consumer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.annotation.KafkaListener;
 import at.fhv.common.domain.event.order.OrderPlaced;
 import at.fhv.user.application.command.CompleteUserCartCheckout;
 import at.fhv.user.application.handler.UserCommandHandler;

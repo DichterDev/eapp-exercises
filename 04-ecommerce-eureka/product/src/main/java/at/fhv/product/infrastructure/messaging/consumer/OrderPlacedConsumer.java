@@ -1,7 +1,6 @@
 package at.fhv.product.infrastructure.messaging.consumer;
 
 import at.fhv.common.domain.event.order.OrderPlaced;
-import at.fhv.common.domain.event.product.ProductFailedToReduceStock;
 import at.fhv.product.application.command.ReduceProductStock;
 import at.fhv.product.application.handler.ProductCommandHandler;
 import lombok.RequiredArgsConstructor;

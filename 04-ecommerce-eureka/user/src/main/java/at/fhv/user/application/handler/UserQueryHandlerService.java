@@ -11,7 +11,7 @@ import at.fhv.user.projection.UserOrder;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,13 +35,19 @@ public class UserQueryHandlerService implements UserQueryHandler {
     public List<UserOrder> getOrders(GetUserOrdersById query) {
         var orders = order.getOrders(query.userId());
 
+        if (orders == null) {
+            return new ArrayList<>();
+        }
+
         return orders.stream()
             .map(
                 order -> new UserOrder(
                     order.orderId(),
                     order.orderItems()
                         .stream()
-                        .map(item -> new OrderItem(item.productId(), item.amount(), item.price()))
+                        .map(
+                            item -> new OrderItem(item.productId(), item.amount(), item.price())
+                        )
                         .toList(),
                     order.status()
                 )

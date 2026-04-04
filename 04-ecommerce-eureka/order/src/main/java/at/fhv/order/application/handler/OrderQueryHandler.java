@@ -13,5 +13,5 @@ public interface OrderQueryHandler {
 
     OrderDetail getDetail(GetOrderDetailById query);
 
-    List<Order> getOrders(GetOrdersByUserId query);
+    List<OrderDetail> getOrders(GetOrdersByUserId query);
 }

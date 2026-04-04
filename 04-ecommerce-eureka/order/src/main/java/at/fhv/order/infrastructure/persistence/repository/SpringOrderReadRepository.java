@@ -29,9 +29,10 @@ public class SpringOrderReadRepository implements OrderReadRepository {
     }
 
     @Override
-    public List<Order> getByUserId(UUID userId) {
-        return jpa.findByUserId(userId).stream()
-                .map(mapper::toProjection)
-                .toList();
+    public List<OrderDetail> getByUserId(UUID userId) {
+        return jpa.findByUserId(userId)
+            .stream()
+            .map(mapper::toDetail)
+            .toList();
     }
 }
