@@ -1,0 +1,8 @@
+rootProject.name = 'ecommerce'
+
+include 'common'
+include 'user'
+include 'product'
+include 'order'
+include 'gateway'
+include 'discovery'
