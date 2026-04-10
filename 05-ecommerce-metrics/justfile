@@ -1,0 +1,20 @@
+gradle := "./gradlew"
+order := "./order/build/libs/order-0.0.1-SNAPSHOT.jar"
+user := "./user/build/libs/user-0.0.1-SNAPSHOT.jar"
+product := "./product/build/libs/product-0.0.1-SNAPSHOT.jar"
+gateway := "./gateway/build/libs/gateway-0.0.1-SNAPSHOT.jar"
+discovery := "./discovery/build/libs/discovery-0.0.1-SNAPSHOT.jar"
+
+clean:
+    {{ gradle }} clean
+
+build:
+    {{ gradle }} build
+
+bnr:
+    {{ gradle }} build -x test
+    docker compose up -d kafka postgres
+    sleep 5;
+    docker compose up -d --force-recreate discovery-service
+    sleep 20;
+    docker compose up -d --force-recreate gateway-service order-service product-service user-service
