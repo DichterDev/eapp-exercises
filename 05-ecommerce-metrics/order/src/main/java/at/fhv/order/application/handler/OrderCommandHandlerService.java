@@ -11,6 +11,7 @@ import at.fhv.order.domain.model.ProductId;
 import at.fhv.order.domain.model.UserId;
 import at.fhv.order.domain.port.OrderEventPublisher;
 import at.fhv.order.domain.port.OrderWriteRepository;
+import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,8 @@ public class OrderCommandHandlerService implements OrderCommandHandler {
     private final OrderWriteRepository repository;
     private final OrderEventPublisher publisher;
     private final ProductClient product;
+
+    private final MeterRegistry meter;
 
     private Order get(UUID id) {
         return repository.findById(new OrderId(id)).orElseThrow();
@@ -62,6 +65,8 @@ public class OrderCommandHandlerService implements OrderCommandHandler {
 
         publisher.publishAll(order.pullEvents());
 
+        meter.counter("order.placed.total").increment();
+
         return new CommandResponse(order.getId().value().toString());
     }
 
@@ -72,6 +77,8 @@ public class OrderCommandHandlerService implements OrderCommandHandler {
         order.complete();
 
         repository.save(order);
+
+        meter.counter("order.completed.total").increment();
 
         publisher.publishAll(order.pullEvents());
     }
@@ -84,6 +91,8 @@ public class OrderCommandHandlerService implements OrderCommandHandler {
 
         repository.save(order);
 
+        meter.counter("order.failed.total").increment();
+
         publisher.publishAll(order.pullEvents());
     }
 
@@ -94,6 +103,8 @@ public class OrderCommandHandlerService implements OrderCommandHandler {
         order.cancel();
 
         repository.save(order);
+
+        meter.counter("order.cancelled.total").increment();
 
         publisher.publishAll(order.pullEvents());
     }

@@ -9,6 +9,7 @@ import at.fhv.user.domain.model.User;
 import at.fhv.user.domain.model.UserId;
 import at.fhv.user.domain.port.UserEventPublisher;
 import at.fhv.user.domain.port.UserWriteRepository;
+import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,8 @@ public class UserCommandHandlerService implements UserCommandHandler {
     private final UserEventPublisher publisher;
     private final ProductClient product;
 
+    private final MeterRegistry meter;
+
     private User get(UUID id) {
         return repository.findById(new UserId(id)).orElseThrow();
     }
@@ -35,6 +38,8 @@ public class UserCommandHandlerService implements UserCommandHandler {
 
         publisher.publishAll(user.pullEvents());
 
+        meter.counter("user.register.total").increment();
+
         return new CommandResponse(user.getId().value().toString());
     }
 
@@ -46,6 +51,8 @@ public class UserCommandHandlerService implements UserCommandHandler {
 
         repository.save(user);
 
+        meter.counter("user.rename.total").increment();
+
         publisher.publishAll(user.pullEvents());
     }
 
@@ -54,11 +61,13 @@ public class UserCommandHandlerService implements UserCommandHandler {
         var user = get(cmd.userId());
 
         user.addCartItem(
-            new ProductId(cmd.productId()),
-            cmd.amount()
-        );
+                new ProductId(cmd.productId()),
+                cmd.amount());
 
         repository.save(user);
+
+        meter.counter("user.cart.add.total").increment();
+
         publisher.publishAll(user.pullEvents());
     }
 
@@ -73,6 +82,9 @@ public class UserCommandHandlerService implements UserCommandHandler {
         user.checkout();
 
         repository.save(user);
+
+        meter.counter("user.cart.checkout.total").increment();
+
         publisher.publishAll(user.pullEvents());
     }
 
@@ -83,6 +95,8 @@ public class UserCommandHandlerService implements UserCommandHandler {
         user.completeCheckout();
 
         repository.save(user);
+
+        meter.counter("user.cart.complete.total").increment();
 
         publisher.publishAll(user.pullEvents());
     }

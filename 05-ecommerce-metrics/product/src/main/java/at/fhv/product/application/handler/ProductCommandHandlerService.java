@@ -10,6 +10,8 @@ import at.fhv.product.domain.model.Product;
 import at.fhv.product.domain.model.ProductId;
 import at.fhv.product.domain.port.ProductEventPublisher;
 import at.fhv.product.domain.port.ProductWriteRepository;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,11 +23,12 @@ import java.util.UUID;
 public class ProductCommandHandlerService implements ProductCommandHandler {
     private final ProductWriteRepository repository;
     private final ProductEventPublisher publisher;
+    private final MeterRegistry meter;
 
     private Product get(UUID id) {
-
         return repository.findById(new ProductId(id)).orElseThrow();
     }
+
     @Override
     public CommandResponse create(CreateProduct cmd) {
         var product = Product.create(
@@ -33,12 +36,13 @@ public class ProductCommandHandlerService implements ProductCommandHandler {
                 cmd.name(),
                 cmd.description(),
                 new Money(BigDecimal.valueOf(cmd.price())),
-                cmd.stock()
-        );
+                cmd.stock());
 
         repository.save(product);
 
         publisher.publishAll(product.pullEvents());
+
+        meter.counter("product.create.total").increment();
 
         return new CommandResponse(cmd.productId().toString());
     }
@@ -62,6 +66,9 @@ public class ProductCommandHandlerService implements ProductCommandHandler {
 
         repository.save(product);
 
+        meter.counter("product.stock.total", "product_id", cmd.productId().toString())
+                .increment(-cmd.amount());
+
         publisher.publishAll(product.pullEvents());
     }
 
@@ -73,11 +80,9 @@ public class ProductCommandHandlerService implements ProductCommandHandler {
 
         repository.save(product);
 
+        meter.counter("product.stock.total", "product_id", cmd.productId().toString())
+                .increment(cmd.amount());
+
         publisher.publishAll(product.pullEvents());
     }
 }
-
-
-
-
-
