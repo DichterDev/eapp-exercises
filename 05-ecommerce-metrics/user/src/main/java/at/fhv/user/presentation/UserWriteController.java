@@ -23,8 +23,7 @@ public class UserWriteController {
     public ResponseEntity<CommandResponse> register(@RequestBody RegisterUserBody body) {
         var res = command.register(new RegisterUser(
                 body.userId(),
-                body.name()
-        ));
+                body.name()));
         return ResponseEntity.status(201).body(res);
     }
 
@@ -33,15 +32,14 @@ public class UserWriteController {
         command.addItem(new AddUserCartItem(
                 id,
                 body.productId(),
-                body.amount()
-        ));
+                body.amount()));
     }
 
     @PostMapping("/{id}/cart/checkout")
-    public ResponseEntity<Void> checkout(@PathVariable UUID id) {
-        command.checkout(new CheckoutUserCart(id));
-        return ResponseEntity.accepted().build();
-    }
+    public ResponseEntity<CommandResponse> checkout(@PathVariable UUID id) {
+        var res = command.checkout(new CheckoutUserCart(id));
 
+        return ResponseEntity.ok(res);
+    }
 
 }

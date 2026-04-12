@@ -10,10 +10,13 @@ import at.fhv.user.domain.model.UserId;
 import at.fhv.user.domain.port.UserEventPublisher;
 import at.fhv.user.domain.port.UserWriteRepository;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -61,31 +64,46 @@ public class UserCommandHandlerService implements UserCommandHandler {
         var user = get(cmd.userId());
 
         user.addCartItem(
-                new ProductId(cmd.productId()),
-                cmd.amount());
+            new ProductId(cmd.productId()),
+            cmd.amount()
+        );
 
         repository.save(user);
 
-        meter.counter("user.cart.add.total").increment();
+        meter.counter(
+            "user.cart.add.total",
+            List.of(
+                Tag.of("user_id", user.getId().value().toString()),
+                Tag.of("user_name", user.getName())
+            )
+        ).increment();
 
         publisher.publishAll(user.pullEvents());
     }
 
     @Override
-    public void checkout(CheckoutUserCart cmd) {
+    public CommandResponse checkout(CheckoutUserCart cmd) {
         var user = get(cmd.userId());
 
         if (user.getCart() == null || user.getCart().isEmpty()) {
-            return;
+            throw new NullPointerException();
         }
 
-        user.checkout();
+        UUID orderId = user.checkout();
 
         repository.save(user);
 
-        meter.counter("user.cart.checkout.total").increment();
+        meter.counter(
+            "user.cart.checkout.total",
+            List.of(
+                Tag.of("user_id", user.getId().value().toString()),
+                Tag.of("user_name", user.getName())
+            )
+        ).increment();
 
         publisher.publishAll(user.pullEvents());
+
+        return new CommandResponse(orderId.toString());
     }
 
     @Override
@@ -96,7 +114,13 @@ public class UserCommandHandlerService implements UserCommandHandler {
 
         repository.save(user);
 
-        meter.counter("user.cart.complete.total").increment();
+        meter.counter(
+            "user.cart.complete.total",
+            List.of(
+                Tag.of("user_id", user.getId().value().toString()),
+                Tag.of("user_name", user.getName())
+            )
+        ).increment();
 
         publisher.publishAll(user.pullEvents());
     }
